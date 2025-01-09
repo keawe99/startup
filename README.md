@@ -1,4 +1,4 @@
-# Your startup name here
+sneakpeek
 
 [My Notes](notes.md)
 
