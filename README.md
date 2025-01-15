@@ -28,10 +28,15 @@ SneakPeak is the ultimate platform for sneakerheads and fashion lovers to connec
 ### Design
 
 ![SneakPeek Landing Page](assets/SneakPeek_LandingPage.png)
-![SneakPeek Up Page](assets/SneakPeek_LandingUp.png)
+
+![SneakPeek Sign Up Page](assets/SneakPeek_SignUp.png)
+
 ![SneakPeek Login Page](assets/SneakPeek_Login.png)
+
 ![SneakPeek Username Page](assets/SneakPeek_Username.png)
+
 ![SneakPeek Verification Page](assets/SneakPeek_Verification.png)
+
 ![SneakPeek Home Page](assets/SneakPeek_Home.png)
 
 The design of SneakPeak is simple and intuitive, providing a seamless user experience from start to finish. Upon visiting the landing page, users are greeted with key features like upcoming shoe drops and popular posts from the community. Users can easily create an account or log in via Google authentication for quick and secure access. Once logged in, they are taken to their personalized account where they can follow other users, share photos of their sneaker collections, and even post fashion trends and tips. The design emphasizes ease of navigation, allowing users to engage with the app's core functionalities effortlessly while staying connected to the latest in sneaker culture.
