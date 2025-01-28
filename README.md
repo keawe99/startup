@@ -27,11 +27,11 @@ SneakPeak is the ultimate platform for sneakerheads and fashion lovers to connec
 
 ### Design
 
-![SneakPeek Landing Page](assets/SneakPeek_LandingPage.png)
+![SneakPeek Landing Page](assets/SneakPeek_LandingPage.png) <!-- index.html -->
 
-![SneakPeek Sign Up Page](assets/SneakPeek_SignUp.png)
+![SneakPeek Sign Up Page](assets/SneakPeek_SignUp.png) <!-- signUp.html -->
 
-![SneakPeek Login Page](assets/SneakPeek_Login.png)
+![SneakPeek Login Page](assets/SneakPeek_Login.png) <!-- loginPage.html -->
 
 ![SneakPeek Username Page](assets/SneakPeek_Username.png)
 
