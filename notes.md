@@ -14,4 +14,4 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 
 ## HTML Notes
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+For this deliverable, I created a web app using the figma layout that I had made prior to this part of the deliverable. I created six simple webpages for a user to navigate through as they login and create their own sneakpeek360 account. I added a little bit of CSS to make it look more appealing. Still looks a little static but I have a good view of where I want to head from here. I will add more html elements as I progress throughout this project, but for now we will stick with this.
