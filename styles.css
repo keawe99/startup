@@ -1,0 +1,71 @@
+form {
+  padding: 20px;
+}
+
+button {
+  background-color: lightgreen;
+}
+
+.container {
+  display: flex;
+}
+.column {
+  flex: 1;
+  padding: 10px;
+  margin: 5px;
+  background-color: antiquewhite;
+}
+body {
+  background-color: antiquewhite;
+}
+p {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: justify;
+}
+h1 {
+  font-weight: bolder;
+  font-family: Georgia, "Times New Roman", Times, serif;
+  text-align: center;
+}
+li {
+  font-size: larger;
+}
+
+/* CSS to change login and sign-up buttons on index.html */
+
+.header-links {
+  display: flex; /* Use flexbox for horizontal arrangement */
+  justify-content: flex-end; /* Align links to the right */
+  margin-top: 10px; /* Add some top margin */
+  margin-right: 20px; /* Add right margin for spacing */
+}
+
+.header-links a {
+  display: inline-block; /* Make the links behave like inline elements but with block properties */
+  padding: 10px 20px; /* Add padding for button appearance */
+  margin-left: 10px; /* Space between links */
+  text-decoration: none; /* Remove underlines from links */
+  background-color: gray; /* Example blue color */
+  color: white;
+  border-radius: 5px; /* Rounded corners */
+  transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.header-links a:hover {
+  background-color: red; /* Darker blue on hover */
+}
+
+/* Style the links specifically (optional, but good practice) */
+.login-link {
+  background-color: #007bff; /* Blue */
+}
+
+.signup-link {
+  background-color: #28a745; /* Green */
+}
+
+.signup-link:hover {
+  background-color: #1e7e34; /* Darker Green */
+}

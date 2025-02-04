@@ -3,28 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="styles.css" />
     <title>SneakPeek360</title>
   </head>
   <body style="background-color: antiquewhite">
     <!-- Create title -->
-    <h1
-      style="
-        font-weight: bold;
-        font-family: Georgia, 'Times New Roman', Times, serif;
-        text-align: center;
-      "
-    >
+    <h1>
       Welcome to SneakPeek360 <br />
       Steven Armstrong <br />
       <a href="https://github.com/keawe99/startup">My Github</a>
     </h1>
     <!-- Header Links -->
-    <a href="./loginPage.html" style="display: block; text-align: right"
-      >Login</a
-    >
-    <a href="./signUp.html" style="display: block; text-align: right"
-      >Sign Up</a
-    >
+    <div class="header-links">
+      <a href="./loginPage.html" class="login-link">Login</a>
+      <a href="./signUp.html" class="signup-link">Sign Up</a>
+    </div>
+    <br />
     <!-- Logo -->
     <center>
       <img
@@ -36,7 +30,6 @@
     <!-- Introductory Statements -->
     <p
       style="
-        text-align: center;
         font-size: larger;
         font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS',
           sans-serif;
