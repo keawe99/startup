@@ -10,7 +10,7 @@
 
 ## AWS Notes
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+I have bought a DNS name called sneakpeek360.com using Amazon's Route 53 element. I also have an EC2 instance that I am currently renting to deploy the web app on a server in North Virginia. I linked the public ip address to my domain name and was able to get it certified.
 
 ## HTML Notes
 

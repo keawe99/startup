@@ -367,3 +367,38 @@ ul {
   border-color: #007bff; /* Highlight on focus */
   box-shadow: 0 0 5px rgba(0, 123, 255, 0.2); /* Subtle glow */
 }
+
+/* Window sizing readjustments */
+
+/* Styles for smaller screens (e.g., tablets and phones) */
+@media (max-width: 768px) {
+  /* Example breakpoint */
+  body {
+    font-size: 14px;
+  }
+
+  .container {
+    /* Example: Adjust container width */
+    width: 90%;
+  }
+
+  .column {
+    /* Example: Stack columns vertically */
+    flex-direction: column;
+  }
+
+  /* ... other styles for smaller screens ... */
+}
+
+/* Styles for even smaller screens (e.g., phones) */
+@media (max-width: 480px) {
+  /* Example breakpoint */
+  body {
+    font-size: 12px;
+  }
+
+  h1 {
+    /* Example: Reduce heading size */
+    font-size: 2em;
+  }
+}
