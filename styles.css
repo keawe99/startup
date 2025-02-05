@@ -147,6 +147,16 @@ ul {
   align-items: left;
 }
 
+.styled-form-sign-up {
+  width: 200px; /* Adjust width as needed */
+  margin: 20px auto; /* Center the form */
+  padding: 20px;
+  background-color: #f8f9fa; /* Light gray background */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  align-items: left;
+}
+
 .styled-form-verification {
   width: 325px; /* Adjust width as needed */
   margin: 20px auto; /* Center the form */
@@ -164,6 +174,13 @@ ul {
   font-weight: 500;
 }
 
+.styled-form-sign-up label {
+  display: block; /* Label on its own line */
+  margin-bottom: 5px;
+  color: #343a40; /* Dark gray text */
+  font-weight: 500;
+}
+
 .styled-form input[type="email"] {
   width: calc(100% - 12px); /* Full width input with padding accounted for */
   padding: 10px;
@@ -175,13 +192,90 @@ ul {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Smooth transitions */
 }
 
+.styled-form-sign-up input[type="text"],
+.styled-form-sign-up input[type="email"],
+.styled-form-sign-up input[type="password"],
+.styled-form-sign-up input[type="date"] {
+  width: calc(100% - 12px);
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
 .styled-form input[type="email"]:focus {
   border-color: #80bdff; /* Highlight on focus */
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Subtle blue glow */
 }
 
+.styled-form-sign-up input[type="text"]:focus,
+.styled-form-sign-up input[type="email"]:focus,
+.styled-form-sign-up input[type="password"]:focus,
+.styled-form-sign-up input[type="date"]:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
 .styled-form button {
+  background-color: #007bff; /* Blue button */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.15s ease-in-out;
+}
+
+/* Styles for checkboxes */
+.styled-form-sign-up input[type="checkbox"] {
+  appearance: none; /* Remove default checkbox styling */
+  -webkit-appearance: none; /* For Safari */
+  -moz-appearance: none; /* For Firefox */
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ced4da;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-right: 5px; /* Space between checkbox and label */
+  vertical-align: middle; /* Align checkbox with label */
+  margin-bottom: 15px;
+}
+
+.styled-form-sign-up input[type="checkbox"]:checked {
+  background-color: #007bff; /* Blue background when checked */
+  border-color: #007bff;
+  position: relative; /* For the checkmark */
+}
+
+/* Add a checkmark inside the checked checkbox */
+.styled-form-sign-up input[type="checkbox"]:checked::before {
+  content: "\2713"; /* Unicode checkmark character */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 14px;
+}
+
+/* Style the labels for the checkboxes */
+.styled-form-sign-up label[for="nike"],
+.styled-form-sign-up label[for="adidas"],
+.styled-form-sign-up label[for="nb"],
+.styled-form-sign-up label[for="yeezy"],
+.styled-form-sign-up label[for="puma"] {
+  display: inline-block; /* Allow labels to be next to checkboxes */
+  vertical-align: middle; /* Align labels with checkboxes */
+  margin-bottom: 15px;
+}
+
+.styled-form-sign-up button {
   background-color: #007bff; /* Blue button */
   color: white;
   padding: 10px 15px;
@@ -207,9 +301,33 @@ ul {
   background-color: #0069d9; /* Darker blue on hover */
 }
 
+.styled-form-sign-up button:hover {
+  background-color: #0069d9; /* Darker blue on hover */
+}
+
 .styled-form button:focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); /* Slightly stronger blue glow on focus */
+}
+
+.styled-form-sign-up button:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); /* Slightly stronger blue glow on focus */
+}
+
+.shoe-preferences {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(150px, 1fr)
+  ); /* Adjust minmax as needed */
+  gap: 10px;
+}
+
+.shoe-preferences label,
+.shoe-preferences input[type="checkbox"] {
+  display: inline-block; /* So they sit side by side */
+  vertical-align: middle;
 }
 
 /* Styling for back arrow */
