@@ -147,6 +147,16 @@ ul {
   align-items: left;
 }
 
+.styled-form-verification {
+  width: 325px; /* Adjust width as needed */
+  margin: 20px auto; /* Center the form */
+  padding: 20px;
+  background-color: #f8f9fa; /* Light gray background */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  align-items: left;
+}
+
 .styled-form label {
   display: block; /* Label on its own line */
   margin-bottom: 5px;
@@ -182,6 +192,17 @@ ul {
   transition: background-color 0.15s ease-in-out;
 }
 
+.styled-form-verification button {
+  background-color: #007bff; /* Blue button */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.15s ease-in-out;
+}
+
 .styled-form button:hover {
   background-color: #0069d9; /* Darker blue on hover */
 }
@@ -189,4 +210,42 @@ ul {
 .styled-form button:focus {
   outline: 0;
   box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); /* Slightly stronger blue glow on focus */
+}
+
+/* Styling for back arrow */
+
+.arrow-link {
+  display: inline-block; /* Or block if you want it to take up the whole line */
+  /* Other styling for the link (e.g., margin, padding) */
+}
+
+.arrow-image {
+  width: 20px; /* Adjust size as needed */
+  height: auto;
+  /* Other styling for the image (e.g., border, box-shadow) */
+}
+
+/* Style for verification code input */
+
+.segmented-input {
+  display: flex; /* Arrange inputs horizontally */
+  gap: 10px; /* Space between inputs */
+}
+
+.segmented-input input {
+  width: 40px; /* Adjust width as needed */
+  height: 40px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 20px;
+  appearance: none; /* Remove default input styling (optional) */
+  -webkit-appearance: none; /* For Safari */
+  -moz-appearance: none; /* For Firefox */
+}
+
+.segmented-input input:focus {
+  outline: none;
+  border-color: #007bff; /* Highlight on focus */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2); /* Subtle glow */
 }
