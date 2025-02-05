@@ -13,21 +13,81 @@ button {
   flex: 1;
   padding: 10px;
   margin: 5px;
-  background-color: antiquewhite;
+  display: flex;
+  flex-direction: column; /* Essential for sticky footer */
+  min-height: 100%; /* Ensure column takes full height */
 }
-body {
-  background-color: antiquewhite;
+
+.column-content {
+  /* Styles for the content above the footer */
+  flex: 1; /* Allows content to expand and push footer down */
+}
+
+.column-footer-left {
+  /* Styles for the footer */
+  color: white;
+  padding: 10px;
+  text-align: left; /* Align text to the left */
+  margin-top: 150px; /* Push the footer to the bottom */
+}
+
+.column-footer-middle {
+  /* Styles for the footer */
+  color: white;
+  padding: 10px;
+  text-align: center; /* Align text to the left */
+  margin-top: 75px; /* Push the footer to the bottom */
+}
+
+.column-footer-right {
+  /* Styles for the footer */
+  color: white;
+  padding: 10px;
+  text-align: right; /* Align text to the left */
+  margin-top: 730px; /* Push the footer to the bottom */
+}
+
+.background {
+  /* Get rid of background image */
+  background-image: url("./assets/42.blaack-x512.jpg");
+  background-size: cover;
+  filter: contrast(80%);
 }
 p {
   display: flex;
   justify-content: center;
   align-items: center;
   text-align: justify;
+  color: white;
+  font-size: larger;
 }
 h1 {
   font-weight: bolder;
   font-family: Georgia, "Times New Roman", Times, serif;
   text-align: center;
+  color: white;
+  animation: pop 1s ease-in-out; /* Apply the 'pop' animation */
+  display: inline-block; /* Needed for transform to work correctly on inline elements */
+}
+
+.heading {
+  color: white;
+}
+
+/* Controls animation of the title */
+
+@keyframes pop {
+  0% {
+    transform: scale(0.8); /* Start slightly smaller */
+    opacity: 0; /* Start transparent */
+  }
+  50% {
+    transform: scale(1.2); /* Scale up larger than normal */
+    opacity: 1; /* Become fully opaque */
+  }
+  100% {
+    transform: scale(1); /* Return to normal size */
+  }
 }
 li {
   font-size: larger;
@@ -39,18 +99,19 @@ li {
   display: flex; /* Use flexbox for horizontal arrangement */
   justify-content: flex-end; /* Align links to the right */
   margin-top: 10px; /* Add some top margin */
-  margin-right: 20px; /* Add right margin for spacing */
+  margin-right: 0px; /* Add right margin for spacing */
 }
 
 .header-links a {
   display: inline-block; /* Make the links behave like inline elements but with block properties */
   padding: 10px 20px; /* Add padding for button appearance */
-  margin-left: 10px; /* Space between links */
+  margin-left: 5px; /* Space between links */
   text-decoration: none; /* Remove underlines from links */
   background-color: gray; /* Example blue color */
   color: white;
   border-radius: 5px; /* Rounded corners */
   transition: background-color 0.3s ease; /* Smooth hover effect */
+  font-size: larger;
 }
 
 .header-links a:hover {
@@ -68,4 +129,64 @@ li {
 
 .signup-link:hover {
   background-color: #1e7e34; /* Darker Green */
+}
+
+ul {
+  color: white;
+}
+
+/* Form styling */
+
+.styled-form {
+  width: 200px; /* Adjust width as needed */
+  margin: 20px auto; /* Center the form */
+  padding: 20px;
+  background-color: #f8f9fa; /* Light gray background */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  align-items: left;
+}
+
+.styled-form label {
+  display: block; /* Label on its own line */
+  margin-bottom: 5px;
+  color: #343a40; /* Dark gray text */
+  font-weight: 500;
+}
+
+.styled-form input[type="email"] {
+  width: calc(100% - 12px); /* Full width input with padding accounted for */
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ced4da; /* Light gray border */
+  border-radius: 4px;
+  box-sizing: border-box; /* Include padding in width calculation */
+  font-size: 16px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Smooth transitions */
+}
+
+.styled-form input[type="email"]:focus {
+  border-color: #80bdff; /* Highlight on focus */
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Subtle blue glow */
+}
+
+.styled-form button {
+  background-color: #007bff; /* Blue button */
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.styled-form button:hover {
+  background-color: #0069d9; /* Darker blue on hover */
+}
+
+.styled-form button:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); /* Slightly stronger blue glow on focus */
 }
