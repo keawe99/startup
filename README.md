@@ -71,6 +71,8 @@ I am going to use the required technologies in the following ways.
 
   CSS will be used to style the application, creating an attractive, user-friendly design. This will involve customizing fonts, colors, and layout grids to ensure a sleek, modern look that aligns with sneaker culture. Responsive design will be implemented so the app looks great on both mobile and desktop devices.
 
+  I have added more CSS to make the web app look welcoming and fun. I am establishing a sense of culture with the sneaker community by developing an all inclusive site for sneakerheads worldwide to connect and share their collections and ideas in one place.
+
 - **React**
 
   React will be used to build the interactive front-end of the app. It will manage the dynamic components, like the user feed, sneaker collections, and real-time updates for sneaker releases. React's component-based architecture will allow for efficient rendering and seamless user interactions.
