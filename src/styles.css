@@ -28,7 +28,13 @@ button {
   color: white;
   padding: 10px;
   text-align: left; /* Align text to the left */
+  position: relative;
   margin-top: 150px; /* Push the footer to the bottom */
+}
+
+.column-footer-left form {
+  /* Target the form specifically */
+  display: block; /* Ensure it's a block element */
 }
 
 .column-footer-middle {
@@ -49,7 +55,7 @@ button {
 
 .background {
   /* Get rid of background image */
-  background-image: url("./assets/42.blaack-x512.jpg");
+  background-image: url("../public/42.blaack-x512.jpg");
   background-size: cover;
   filter: contrast(80%);
 }
@@ -401,4 +407,12 @@ ul {
     /* Example: Reduce heading size */
     font-size: 2em;
   }
+}
+
+h2 {
+  color: white;
+}
+
+h5 {
+  color: white;
 }
