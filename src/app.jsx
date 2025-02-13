@@ -115,7 +115,10 @@ export default function App() {
               <li>
                 Adidas Gazelle <br />
                 "Bad Bunny" <br />
-                <a href="https://Adidas.com">Adidas.com</a> <br />
+                <NavLink>
+                  <a href="https://Adidas.com">Adidas.com</a>
+                </NavLink>
+                <br />
                 10/31/2024
               </li>
             </ul>

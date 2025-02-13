@@ -1,5 +1,5 @@
 import React from "react";
-import "./aboutUs.css"; // Or the correct path to your CSS
+import "../styles.css"; // Or the correct path to your CSS
 import { Link } from "react-router-dom"; // Import the Link component
 
 const AboutUs = () => {
