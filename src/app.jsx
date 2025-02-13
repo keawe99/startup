@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
 import {
@@ -6,7 +6,6 @@ import {
   NavLink,
   Route,
   Routes,
-  useNavigate,
   Link, // Import Link here
 } from "react-router-dom";
 import LoginPage from "./loginPage/loginPage.jsx";
