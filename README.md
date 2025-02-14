@@ -124,9 +124,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Bundled using Vite** - I did not complete this part of the deliverable.
-- [ ] **Components** - I did not complete this part of the deliverable.
-- [ ] **Router** - Routing between login and voting components.
+- [x] **Bundled using Vite** - I did complete this part of the deliverable.
+- [x] **Components** - I did complete this part of the deliverable.
+- [x] **Router** - Routing between login and voting components.
 
 ## 🚀 React part 2: Reactivity
 
