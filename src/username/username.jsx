@@ -18,7 +18,7 @@ const Username = () => {
   };
 
   return (
-    <div className="background">
+    <div>
       <Link to="/">
         <img alt="backarrow" src="/backarrow.png" className="arrow-image" />
       </Link>

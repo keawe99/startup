@@ -19,7 +19,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="background">
+    <div>
       <Link to="/">
         <img alt="backarrow" src="/backarrow.png" className="arrow-image" />
       </Link>
@@ -42,6 +42,7 @@ export default function LoginPage() {
           onSubmit={handleSubmit} // Add onSubmit handler
         >
           <label htmlFor="Username">Username </label>
+          <br></br>
           <input
             type="text"
             id="Username"
@@ -49,7 +50,7 @@ export default function LoginPage() {
             onChange={handleChange} // Add onChange handler
           />
           <br /> <br />
-          <label htmlFor="Password">Password </label>
+          <label htmlFor="Password">Password </label> <br></br>
           <input
             type="password"
             id="Password"

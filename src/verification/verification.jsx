@@ -19,7 +19,7 @@ const Verification = () => {
   };
 
   return (
-    <div className="background">
+    <div>
       <h2
         style={{
           textAlign: "center",

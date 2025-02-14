@@ -4,13 +4,14 @@ import { Link } from "react-router-dom"; // Import the Link component
 
 const AboutUs = () => {
   return (
-    <div className="background">
+    <div>
       <Link to="/">
         {" "}
         <img
           alt="backarrow"
           src="/backarrow.png" // Path relative to the public directory
           className="arrow-image"
+          style={"width: 20px height: 20px;"}
         />
       </Link>
       <center>

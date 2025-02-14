@@ -1,412 +1,16 @@
-form {
-  padding: 20px;
-}
-
-button {
-  background-color: lightgreen;
-}
-
-.container {
-  display: flex;
-}
-.column {
-  flex: 1;
-  padding: 10px;
-  margin: 5px;
-  display: flex;
-  flex-direction: column; /* Essential for sticky footer */
-  min-height: 100%; /* Ensure column takes full height */
-}
-
-.column-content {
-  /* Styles for the content above the footer */
-  flex: 1; /* Allows content to expand and push footer down */
-}
-
-.column-footer-left {
-  /* Styles for the footer */
+/* styles.css */
+/* General Styles */
+body {
+  font-family: sans-serif;
   color: white;
-  padding: 10px;
-  text-align: left; /* Align text to the left */
-  position: relative;
-  margin-top: 150px; /* Push the footer to the bottom */
 }
 
-.column-footer-left form {
-  /* Target the form specifically */
-  display: block; /* Ensure it's a block element */
-}
-
-.column-footer-middle {
-  /* Styles for the footer */
-  color: white;
-  padding: 10px;
-  text-align: center; /* Align text to the left */
-  margin-top: 75px; /* Push the footer to the bottom */
-}
-
-.column-footer-right {
-  /* Styles for the footer */
-  color: white;
-  padding: 10px;
-  text-align: right; /* Align text to the left */
-  margin-top: 730px; /* Push the footer to the bottom */
-}
-
-.background {
-  /* Get rid of background image */
-  background-image: url("../public/42.blaack-x512.jpg");
-  background-size: cover;
-  filter: contrast(80%);
-}
-p {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: justify;
-  color: white;
-  font-size: larger;
-}
 h1 {
   font-weight: bolder;
   font-family: Georgia, "Times New Roman", Times, serif;
   text-align: center;
-  color: white;
-  animation: pop 1s ease-in-out; /* Apply the 'pop' animation */
-  display: inline-block; /* Needed for transform to work correctly on inline elements */
-}
-
-.heading {
-  color: white;
-}
-
-/* Controls animation of the title */
-
-@keyframes pop {
-  0% {
-    transform: scale(0.8); /* Start slightly smaller */
-    opacity: 0; /* Start transparent */
-  }
-  50% {
-    transform: scale(1.2); /* Scale up larger than normal */
-    opacity: 1; /* Become fully opaque */
-  }
-  100% {
-    transform: scale(1); /* Return to normal size */
-  }
-}
-li {
-  font-size: larger;
-}
-
-/* CSS to change login and sign-up buttons on index.html */
-
-.header-links {
-  display: flex; /* Use flexbox for horizontal arrangement */
-  justify-content: flex-end; /* Align links to the right */
-  margin-top: 10px; /* Add some top margin */
-  margin-right: 0px; /* Add right margin for spacing */
-}
-
-.header-links a {
-  display: inline-block; /* Make the links behave like inline elements but with block properties */
-  padding: 10px 20px; /* Add padding for button appearance */
-  margin-left: 5px; /* Space between links */
-  text-decoration: none; /* Remove underlines from links */
-  background-color: gray; /* Example blue color */
-  color: white;
-  border-radius: 5px; /* Rounded corners */
-  transition: background-color 0.3s ease; /* Smooth hover effect */
-  font-size: larger;
-}
-
-.header-links a:hover {
-  background-color: red; /* Darker blue on hover */
-}
-
-/* Style the links specifically (optional, but good practice) */
-.login-link {
-  background-color: #007bff; /* Blue */
-}
-
-.signup-link {
-  background-color: #28a745; /* Green */
-}
-
-.signup-link:hover {
-  background-color: #1e7e34; /* Darker Green */
-}
-
-ul {
-  color: white;
-}
-
-/* Form styling */
-
-.styled-form {
-  width: 200px; /* Adjust width as needed */
-  margin: 20px auto; /* Center the form */
-  padding: 20px;
-  background-color: #f8f9fa; /* Light gray background */
-  border-radius: 8px; /* Rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  align-items: left;
-}
-
-.styled-form-sign-up {
-  width: 200px; /* Adjust width as needed */
-  margin: 20px auto; /* Center the form */
-  padding: 20px;
-  background-color: #f8f9fa; /* Light gray background */
-  border-radius: 8px; /* Rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  align-items: left;
-}
-
-.styled-form-verification {
-  width: 325px; /* Adjust width as needed */
-  margin: 20px auto; /* Center the form */
-  padding: 20px;
-  background-color: #f8f9fa; /* Light gray background */
-  border-radius: 8px; /* Rounded corners */
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-  align-items: left;
-}
-
-.styled-form label {
-  display: block; /* Label on its own line */
-  margin-bottom: 5px;
-  color: #343a40; /* Dark gray text */
-  font-weight: 500;
-}
-
-.styled-form-sign-up label {
-  display: block; /* Label on its own line */
-  margin-bottom: 5px;
-  color: #343a40; /* Dark gray text */
-  font-weight: 500;
-}
-
-.styled-form input[type="email"] {
-  width: calc(100% - 12px); /* Full width input with padding accounted for */
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ced4da; /* Light gray border */
-  border-radius: 4px;
-  box-sizing: border-box; /* Include padding in width calculation */
-  font-size: 16px;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; /* Smooth transitions */
-}
-
-.styled-form-sign-up input[type="text"],
-.styled-form-sign-up input[type="email"],
-.styled-form-sign-up input[type="password"],
-.styled-form-sign-up input[type="date"] {
-  width: calc(100% - 12px);
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  box-sizing: border-box;
-  font-size: 16px;
-  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-}
-
-.styled-form input[type="email"]:focus {
-  border-color: #80bdff; /* Highlight on focus */
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Subtle blue glow */
-}
-
-.styled-form-sign-up input[type="text"]:focus,
-.styled-form-sign-up input[type="email"]:focus,
-.styled-form-sign-up input[type="password"]:focus,
-.styled-form-sign-up input[type="date"]:focus {
-  border-color: #80bdff;
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-.styled-form button {
-  background-color: #007bff; /* Blue button */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.15s ease-in-out;
-}
-
-/* Styles for checkboxes */
-.styled-form-sign-up input[type="checkbox"] {
-  appearance: none; /* Remove default checkbox styling */
-  -webkit-appearance: none; /* For Safari */
-  -moz-appearance: none; /* For Firefox */
-  width: 20px;
-  height: 20px;
-  border: 2px solid #ced4da;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-right: 5px; /* Space between checkbox and label */
-  vertical-align: middle; /* Align checkbox with label */
-  margin-bottom: 15px;
-}
-
-.styled-form-sign-up input[type="checkbox"]:checked {
-  background-color: #007bff; /* Blue background when checked */
-  border-color: #007bff;
-  position: relative; /* For the checkmark */
-}
-
-/* Add a checkmark inside the checked checkbox */
-.styled-form-sign-up input[type="checkbox"]:checked::before {
-  content: "\2713"; /* Unicode checkmark character */
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 14px;
-}
-
-/* Style the labels for the checkboxes */
-.styled-form-sign-up label[for="nike"],
-.styled-form-sign-up label[for="adidas"],
-.styled-form-sign-up label[for="nb"],
-.styled-form-sign-up label[for="yeezy"],
-.styled-form-sign-up label[for="puma"] {
-  display: inline-block; /* Allow labels to be next to checkboxes */
-  vertical-align: middle; /* Align labels with checkboxes */
-  margin-bottom: 15px;
-}
-
-.styled-form-sign-up button {
-  background-color: #007bff; /* Blue button */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.styled-form-verification button {
-  background-color: #007bff; /* Blue button */
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.15s ease-in-out;
-}
-
-.styled-form button:hover {
-  background-color: #0069d9; /* Darker blue on hover */
-}
-
-.styled-form-sign-up button:hover {
-  background-color: #0069d9; /* Darker blue on hover */
-}
-
-.styled-form button:focus {
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); /* Slightly stronger blue glow on focus */
-}
-
-.styled-form-sign-up button:focus {
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5); /* Slightly stronger blue glow on focus */
-}
-
-.shoe-preferences {
-  display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(150px, 1fr)
-  ); /* Adjust minmax as needed */
-  gap: 10px;
-}
-
-.shoe-preferences label,
-.shoe-preferences input[type="checkbox"] {
-  display: inline-block; /* So they sit side by side */
-  vertical-align: middle;
-}
-
-/* Styling for back arrow */
-
-.arrow-link {
-  display: inline-block; /* Or block if you want it to take up the whole line */
-  /* Other styling for the link (e.g., margin, padding) */
-}
-
-.arrow-image {
-  width: 20px; /* Adjust size as needed */
-  height: auto;
-  /* Other styling for the image (e.g., border, box-shadow) */
-}
-
-/* Style for verification code input */
-
-.segmented-input {
-  display: flex; /* Arrange inputs horizontally */
-  gap: 10px; /* Space between inputs */
-}
-
-.segmented-input input {
-  width: 40px; /* Adjust width as needed */
-  height: 40px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  text-align: center;
-  font-size: 20px;
-  appearance: none; /* Remove default input styling (optional) */
-  -webkit-appearance: none; /* For Safari */
-  -moz-appearance: none; /* For Firefox */
-}
-
-.segmented-input input:focus {
-  outline: none;
-  border-color: #007bff; /* Highlight on focus */
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2); /* Subtle glow */
-}
-
-/* Window sizing readjustments */
-
-/* Styles for smaller screens (e.g., tablets and phones) */
-@media (max-width: 768px) {
-  /* Example breakpoint */
-  body {
-    font-size: 14px;
-  }
-
-  .container {
-    /* Example: Adjust container width */
-    width: 90%;
-  }
-
-  .column {
-    /* Example: Stack columns vertically */
-    flex-direction: column;
-  }
-
-  /* ... other styles for smaller screens ... */
-}
-
-/* Styles for even smaller screens (e.g., phones) */
-@media (max-width: 480px) {
-  /* Example breakpoint */
-  body {
-    font-size: 12px;
-  }
-
-  h1 {
-    /* Example: Reduce heading size */
-    font-size: 2em;
-  }
+  animation: pop 1s ease-in-out;
+  display: inline-block;
 }
 
 h2 {
@@ -415,4 +19,169 @@ h2 {
 
 h5 {
   color: white;
+}
+
+p {
+  text-align: center;
+  font-size: larger;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+ul {
+  color: white;
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  font-size: larger;
+}
+
+/* Container and Columns (using Bootstrap classes) */
+.background {
+  background-image: url("../public/42.blaack-x512.jpg");
+  background-size: cover;
+  filter: contrast(80%);
+}
+
+.container {
+  padding: 20px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.col-md-4 {
+  padding: 20px;
+}
+
+.col-md-8 {
+  padding: 20px;
+}
+
+.col-md-12 {
+  /* Full width for header links */
+  padding: 20px;
+}
+
+/* Header Links */
+.header-links {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.header-links a,
+.header-links .nav-link {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-left: 5px;
+  background-color: gray;
+  color: white;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+  font-size: larger;
+}
+
+.header-links a:hover,
+.header-links .nav-link:hover {
+  background-color: red;
+}
+
+/* Footer Styles */
+footer {
+  color: white;
+  padding: 10px;
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Center Content */
+.justify-content-center {
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.col-md-4 {
+  padding: 20px;
+}
+.col-md-8 {
+  padding: 20px;
+}
+
+.arrow-image {
+  height: 30px;
+  width: 25px;
+}
+
+/* styles.css */
+.landing-page-container {
+  display: flex; /* Use flexbox for layout */
+  min-height: 100vh; /* Ensure full viewport height */
+  background-color: #282c34; /* Dark background color */
+  color: white; /* White text color */
+  padding: 20px; /* Add some padding */
+}
+
+.feed-container {
+  flex: 1; /* Take up available space */
+  overflow-y: auto; /* Add scrolling if content overflows */
+  padding-right: 20px; /* Space between feed and user info */
+}
+
+.post {
+  margin-bottom: 20px; /* Space between posts */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 8px; /* Rounded corners */
+  overflow: hidden; /* Hide overflowing content */
+}
+
+.post-header {
+  display: flex;
+  align-items: center; /* Vertically center items */
+  padding: 10px;
+  background-color: #333; /* Slightly darker background */
+}
+
+.profile-pic {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.username {
+  font-weight: bold;
+}
+
+.post-image {
+  width: 100%;
+  display: block; /* Prevent image from creating extra space */
+}
+
+.post-content {
+  padding: 10px;
+}
+
+.view-comments {
+  color: #007bff; /* Blue link color */
+  text-decoration: none;
+}
+
+.user-info-column {
+  width: 250px; /* Fixed width for user info */
+  padding: 20px;
+  border-left: 1px solid #ddd; /* Separator line */
+}
+
+.heading {
+  text-align: right;
 }
