@@ -1,8 +1,12 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../styles.css";
 
-const LandingPage = () => {
+const LandingPage = ({ username }) => {
+  useEffect(() => {
+    // This useEffect will run when the username prop changes
+    console.log("Username prop in LandingPage:", username); // Optional: Check the value
+  }, [username]); // Run effect when username changes
   return (
     <div className="landing-page-container">
       {" "}
@@ -78,7 +82,7 @@ const LandingPage = () => {
       <div className="user-info-column">
         {" "}
         {/* User info on the side */}
-        <h3 className="heading">Welcome User!</h3>
+        <h3 className="heading">Welcome {username || "User!"}!</h3>
       </div>
     </div>
   );

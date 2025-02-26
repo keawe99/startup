@@ -2,16 +2,21 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles.css";
 
-export default function LoginPage() {
+export default function LoginPage({ setUsername }) {
+  // Receive setUsername as prop
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Form Data:", formData); // Replace with your logic
-
-    // After successful login, navigate to the appropriate page
-    navigate("/landingPage"); // Example: navigate to verification page
+    console.log("Form Data:", formData);
+    if (formData["Username-id"]) {
+      // Check if username is present
+      setUsername(formData["Username-id"]); // Update username state in App
+      navigate("/landingPage");
+    } else {
+      alert("Please enter a username.");
+    }
   };
 
   const handleChange = (event) => {
@@ -39,23 +44,23 @@ export default function LoginPage() {
         <form
           className="styled-form"
           style={{ padding: "20px" }}
-          onSubmit={handleSubmit} // Add onSubmit handler
+          onSubmit={handleSubmit}
         >
           <label htmlFor="Username">Username </label>
-          <br></br>
+          <br />
           <input
             type="text"
             id="Username"
             name="Username-id"
-            onChange={handleChange} // Add onChange handler
+            onChange={handleChange}
           />
           <br /> <br />
-          <label htmlFor="Password">Password </label> <br></br>
+          <label htmlFor="Password">Password </label> <br />
           <input
             type="password"
             id="Password"
             name="Password"
-            onChange={handleChange} // Add onChange handler
+            onChange={handleChange}
           />
           <br /> <br />
           <button type="submit">Submit</button>

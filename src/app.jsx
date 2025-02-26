@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useState } from "react"; // Correct import here
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
-import { BrowserRouter, NavLink, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter, NavLink, Route, Routes, Link } from "react-router-dom"; // Remove useState from here
 import LoginPage from "./loginPage/loginPage.jsx";
 import AboutUs from "./aboutUs/aboutUs.jsx";
 import SignUp from "./signUp/signUp.jsx";
@@ -61,6 +61,15 @@ function NotFound() {
 }
 
 export default function App() {
+  const [user, setUser] = useState(null); // Initialize user state
+  const [username, setUsername] = useState(""); // Add username state
+
+  const setUsernameWithCallback = (newUsername, callback) => {
+    setUsername(newUsername);
+    if (callback) {
+      callback(); // Execute the callback after the state update
+    }
+  };
   return (
     <BrowserRouter>
       <div className="background">
@@ -103,12 +112,21 @@ export default function App() {
           </div>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/loginPage" element={<LoginPage />} />
+            <Route
+              path="/loginPage"
+              element={<LoginPage setUsername={setUsername} />}
+            />
             <Route path="/aboutUs" element={<AboutUs />} />
             <Route path="/signUp" element={<SignUp />} />
-            <Route path="/landingPage" element={<LandingPage />} />
+            <Route
+              path="/landingPage"
+              element={<LandingPage username={username} />} // Pass username
+            />
             <Route path="/latestDrops" element={<LatestDrops />} />
-            <Route path="/username" element={<Username />} />
+            <Route
+              path="/username"
+              element={<Username setUsername={setUsernameWithCallback} />} // Pass setUsername
+            />
             <Route path="/verification" element={<Verification />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

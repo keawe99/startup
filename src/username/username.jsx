@@ -2,15 +2,21 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles.css";
 
-const Username = () => {
+const Username = ({ setUsername }) => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Form Data:", formData); // Replace with your logic
-
-    navigate("/landingPage"); // Navigate to landing page
+    console.log("Form Data:", formData);
+    if (formData["Username-id"]) {
+      setUsername(formData["Username-id"], () => {
+        // Callback: Navigate after state update
+        navigate("/landingPage");
+      });
+    } else {
+      alert("Please enter a username.");
+    }
   };
 
   const handleChange = (event) => {

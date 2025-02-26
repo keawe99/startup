@@ -11,7 +11,7 @@ const Verification = () => {
 
     console.log("Verification Code:", formData); // Replace with your logic
 
-    navigate("/landingPage"); // Navigate to landing page
+    navigate("/username"); // Navigate to username page for user to create username
   };
 
   const handleChange = (event) => {
