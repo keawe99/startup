@@ -23,3 +23,7 @@ For this deliverable, I added an embedded youtube video on the homepage screen t
 ## React Notes
 
 For this deliverable, I had to download react and inject it into my current project. The initial set-up wasn't too challenging, especially since the directions walk us through it pretty easily. However, it took a while for the layout that I want to be created. It was a little challenging splitting up certain parts of my view pages into columns, so I created another separate view called latestDrops. From there, users can easily navigate to a page where the latest drops of sneakers will update.
+
+## React 2 Notes
+
+For this deliverable, I really wanted to focus on displaying the user's username on my landing page when they log in or create a username. I was able to do so implementing the useState and useEffect methods from React. I had to assign the username variable into the parent file (app.jsx), then create a function inside of username.jsx and pass the returned value into landingPage.jsx. I also did the same thing for loginPage.jsx. Next steps will be to verify if the user has an account and send them a verification email when I get there, but I will need to have my database handle that information.
