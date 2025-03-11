@@ -27,3 +27,22 @@ For this deliverable, I had to download react and inject it into my current proj
 ## React 2 Notes
 
 For this deliverable, I really wanted to focus on displaying the user's username on my landing page when they log in or create a username. I was able to do so implementing the useState and useEffect methods from React. I had to assign the username variable into the parent file (app.jsx), then create a function inside of username.jsx and pass the returned value into landingPage.jsx. I also did the same thing for loginPage.jsx. Next steps will be to verify if the user has an account and send them a verification email when I get there, but I will need to have my database handle that information.
+
+## Services Notes
+
+For this deliverable, I am working on authenticating my users that login or create an account in sneakpeek360. Right now, I am having issues with my backend code with an internal server issue. This issue is specifically with the signUp.jsx file. Revise index.js and/or signUp.jsx files to see if they can fix those issues.
+
+As for loginPage.jsx, I am also having internal server errors. Here is the specific error that arises when I try to login: loginService.js:10
+POST http://localhost:5173/api/auth/login 500 (Internal Server Error)
+loginUser @ loginService.js:10
+handleSubmit @ loginPage.jsx:14
+
+loginService.js:26 Login service error: SyntaxError: Unexpected end of JSON input
+loginUser @ loginService.js:26
+await in loginUser
+handleSubmit @ loginPage.jsx:14
+loginPage.jsx:18 Uncaught (in promise) ReferenceError: setError is not defined
+at handleSubmit (loginPage.jsx:18:7)
+handleSubmit @ loginPage.jsx:18
+
+Could be because I don't have a current token assigned with my account? In other words, maybe it's because I haven't created an account yet? I doubt that but will need to dive deeper on what is going on. Check on why API (/api/auth/create) isn't registering correctly.
