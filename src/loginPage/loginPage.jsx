@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { loginUser, logoutUser } from "./loginService";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles.css";
 
@@ -7,15 +8,23 @@ export default function LoginPage({ setUsername }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form Data:", formData);
-    if (formData["Username-id"]) {
-      // Check if username is present
-      setUsername(formData["Username-id"]); // Update username state in App
+    try {
+      const data = await loginUser(formData);
+      setUsername(data.email);
       navigate("/landingPage");
-    } else {
-      alert("Please enter a username.");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      navigate("/"); // Or wherever you want to navigate after logout
+    } catch (err) {
+      setError(err.message);
     }
   };
 

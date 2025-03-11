@@ -1,22 +1,36 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
-import "../styles.css"; // Or the correct path to your CSS
+import { Link, useNavigate } from "react-router-dom";
+import "../styles.css";
 
 const SignUp = () => {
-  const navigate = useNavigate(); // Initialize useNavigate
-  const [formData, setFormData] = useState({}); // Store form data
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({});
+  const [error, setError] = useState(null);
 
-  const handleSubmit = (event) => {
-    event.preventDefault(); // Prevent default form submission
-    // Process form data (e.g., send to API, store in state)
-    console.log("Form Data:", formData);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    try {
+      const response = await fetch("/api/auth/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    // Navigate to the username page
-    navigate("/verification");
+      if (response.ok) {
+        navigate("/verification");
+      } else {
+        const errorData = await response.json();
+        setError(errorData.msg || "Signup failed");
+      }
+    } catch (err) {
+      setError("Network error");
+    }
   };
 
   const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+    const { type, name, value, checked } = event.target;
+    const newValue = type === "checkbox" ? checked : value;
+    setFormData({ ...formData, [name]: newValue });
   };
 
   return (

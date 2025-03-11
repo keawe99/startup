@@ -1,52 +1,75 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const bcrypt = require("bcryptjs");
-const uuid = require("uuid");
+const bcrypt = require("bcryptjs"); // For password hashing
+const uuid = require("uuid"); // For generating unique IDs
 
 const app = express();
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 const authCookieName = "token";
 
-let users = []; // In-memory user storage (replace with a database in production)
+// In-memory user storage (replace with a database in production)
+let users = [];
 
-app.use(express.static("public"));
+// Middleware
 app.use(express.json()); // For parsing JSON request bodies
 app.use(cookieParser());
 
 // API Router
 const apiRouter = express.Router();
-app.use("/api", apiRouter);
+app.use(`/api`, apiRouter);
 
 // User Registration
 apiRouter.post("/auth/create", async (req, res) => {
-  if (users.find((u) => u.email === req.body.email)) {
-    return res.status(409).send({ msg: "Existing user" });
+  try {
+    // Check if user with the same email already exists
+    if (users.find((u) => u.email === req.body.email)) {
+      return res.status(409).json({ msg: "Existing user" });
+    }
+
+    // Hash the password
+    const passwordHash = await bcrypt.hash(req.body.password, 10);
+
+    // Create a new user object
+    const newUser = {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      email: req.body.email,
+      password: passwordHash,
+      birthday: req.body.birthday,
+      nike: req.body.nike,
+      adidas: req.body.adidas,
+      nb: req.body.nb,
+      yeezy: req.body.yeezy,
+      puma: req.body.puma,
+      token: uuid.v4(), // Generate a unique authentication token
+    };
+
+    // Add the new user to the users array
+    users.push(newUser);
+
+    // Set the authentication cookie
+    res.cookie(authCookieName, newUser.token, {
+      httpOnly: true,
+      secure: true, // Set to true in production if using HTTPS
+      sameSite: "strict",
+    });
+
+    // Send a success response
+    res.status(201).json({ email: newUser.email });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ msg: "Failed to create user" });
   }
-
-  const passwordHash = await bcrypt.hash(req.body.password, 10);
-  const user = {
-    email: req.body.email,
-    password: passwordHash,
-    token: uuid.v4(),
-  };
-  users.push(user);
-
-  res.cookie(authCookieName, user.token, {
-    httpOnly: true,
-    secure: true,
-    sameSite: "strict",
-  });
-  res.send({ email: user.email });
 });
 
 // User Login
 apiRouter.post("/auth/login", async (req, res) => {
   const user = users.find((u) => u.email === req.body.email);
   if (user && (await bcrypt.compare(req.body.password, user.password))) {
-    user.token = uuid.v4();
+    user.token = uuid.v4(); // Generate a unique authentication token
     res.cookie(authCookieName, user.token, {
       httpOnly: true,
-      secure: true,
+      secure: true, // Set to true in production if using HTTPS
       sameSite: "strict",
     });
     return res.send({ email: user.email });
