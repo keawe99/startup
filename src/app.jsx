@@ -1,7 +1,7 @@
-import React, { useState } from "react"; // Correct import here
+import React, { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
-import { BrowserRouter, NavLink, Route, Routes, Link } from "react-router-dom"; // Remove useState from here
+import { BrowserRouter, NavLink, Route, Routes, Link } from "react-router-dom";
 import LoginPage from "./loginPage/loginPage.jsx";
 import AboutUs from "./aboutUs/aboutUs.jsx";
 import SignUp from "./signUp/signUp.jsx";

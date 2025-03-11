@@ -43,7 +43,7 @@ li {
 
 /* Container and Columns (using Bootstrap classes) */
 .background {
-  background-image: url("../public/42.blaack-x512.jpg");
+  background-image: url("../42.blaack-x512.jpg");
   background-size: cover;
   filter: contrast(80%);
 }
