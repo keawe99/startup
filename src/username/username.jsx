@@ -10,10 +10,8 @@ const Username = ({ setUsername }) => {
     event.preventDefault();
     console.log("Form Data:", formData);
     if (formData["Username-id"]) {
-      setUsername(formData["Username-id"], () => {
-        // Callback: Navigate after state update
-        navigate("/landingPage");
-      });
+      setUsername(formData["Username-id"]);
+      navigate("/landingPage"); // Navigate after setting username
     } else {
       alert("Please enter a username.");
     }
@@ -41,16 +39,13 @@ const Username = ({ setUsername }) => {
         Create a Username and Password
       </h3>
       <center>
-        <form
-          className="styled-form"
-          onSubmit={handleSubmit} // Add onSubmit handler
-        >
+        <form className="styled-form" onSubmit={handleSubmit}>
           <label htmlFor="Username">Username </label>
           <input
             type="text"
             id="Username"
             name="Username-id"
-            onChange={handleChange} // Add onChange handler
+            onChange={handleChange}
           />
           <br /> <br />
           <label htmlFor="Password">Password </label>
@@ -58,7 +53,7 @@ const Username = ({ setUsername }) => {
             type="password"
             id="Password"
             name="Password"
-            onChange={handleChange} // Add onChange handler
+            onChange={handleChange}
           />
           <br /> <br />
           <button style={{ position: "right" }} type="submit">

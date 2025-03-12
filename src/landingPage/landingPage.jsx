@@ -1,25 +1,30 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { logoutUser } from "../loginPage/loginService";
 import "../styles.css";
 
-const LandingPage = ({ username }) => {
+const LandingPage = ({ username, setUsername }) => {
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // This useEffect will run when the username prop changes
-    console.log("Username prop in LandingPage:", username); // Optional: Check the value
-  }, [username]); // Run effect when username changes
+    console.log("Username prop in LandingPage:", username);
+  }, [username]);
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      setUsername(null);
+      navigate("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
+
   return (
     <div className="landing-page-container">
-      {" "}
-      {/* Main container */}
       <div className="feed-container">
-        {" "}
-        {/* Container for the feed */}
         <div className="post">
-          {" "}
-          {/* Individual post */}
           <div className="post-header">
-            {" "}
-            {/* Header with profile and name */}
             <img
               alt="profilePic"
               src="https://images.wsj.net/im-322538/?width=700&height=467"
@@ -33,8 +38,6 @@ const LandingPage = ({ username }) => {
             className="post-image"
           />
           <div className="post-content">
-            {" "}
-            {/* Content and comments link */}
             <div className="username">DjSneakerHead</div>
             <p>
               "THE WAIT IS OVER! 😱🔥 Just secured my pair of the Air Jordan 5
@@ -49,7 +52,6 @@ const LandingPage = ({ username }) => {
             </a>
           </div>
         </div>
-        {/* Repeat the post structure for other posts */}
         <div className="post">
           <div className="post-header">
             <img
@@ -80,9 +82,8 @@ const LandingPage = ({ username }) => {
         </div>
       </div>
       <div className="user-info-column">
-        {" "}
-        {/* User info on the side */}
         <h3 className="heading">Welcome {username || "User!"}!</h3>
+        <button onClick={handleLogout}>Logout</button>
       </div>
     </div>
   );

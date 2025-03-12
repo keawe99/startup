@@ -8,7 +8,6 @@ import SignUp from "./signUp/signUp.jsx";
 import LandingPage from "./landingPage/landingPage.jsx";
 import LatestDrops from "./latestDrops/latestDrops.jsx";
 import Username from "./username/username.jsx";
-import Verification from "./verification/verification.jsx";
 
 const Home = () => {
   return (
@@ -61,28 +60,15 @@ function NotFound() {
 }
 
 export default function App() {
-  const [user, setUser] = useState(null); // Initialize user state
-  const [username, setUsername] = useState(""); // Add username state
+  const [username, setUsername] = useState("");
 
-  const setUsernameWithCallback = (newUsername, callback) => {
-    setUsername(newUsername);
-    if (callback) {
-      callback(); // Execute the callback after the state update
-    }
-  };
   return (
     <BrowserRouter>
       <div className="background">
         <div className="container">
           <div className="row">
-            {" "}
-            {/* Added row here */}
             <div className="col-md-12">
-              {" "}
-              {/* Occupy full width */}
               <div className="header-links justify-content-end">
-                {" "}
-                {/* Justify to the end */}
                 <NavLink className="nav-link" to="/loginPage">
                   Login
                 </NavLink>
@@ -94,7 +80,6 @@ export default function App() {
                   Latest Drops
                 </NavLink>
                 <a href="/">
-                  {" "}
                   <img
                     alt="SneakPeek360 Small Logo"
                     src="/SneakPeekLogo.png"
@@ -120,15 +105,18 @@ export default function App() {
             <Route path="/signUp" element={<SignUp />} />
             <Route
               path="/landingPage"
-              element={<LandingPage username={username} />} // Pass username
+              element={
+                <LandingPage
+                  username={username}
+                  setUsername={setUsername} // Pass setUsername to LandingPage
+                />
+              }
             />
             <Route path="/latestDrops" element={<LatestDrops />} />
             <Route
               path="/username"
-              element={<Username setUsername={setUsernameWithCallback} />} // Pass setUsername
+              element={<Username setUsername={setUsername} />}
             />
-            <Route path="/verification" element={<Verification />} />
-            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </div>

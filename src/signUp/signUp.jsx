@@ -17,7 +17,7 @@ const SignUp = () => {
       });
 
       if (response.ok) {
-        navigate("/verification");
+        navigate("/username");
       } else {
         const errorData = await response.json();
         setError(errorData.msg || "Signup failed");

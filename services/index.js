@@ -64,17 +64,24 @@ apiRouter.post("/auth/create", async (req, res) => {
 
 // User Login
 apiRouter.post("/auth/login", async (req, res) => {
-  const user = users.find((u) => u.email === req.body.email);
-  if (user && (await bcrypt.compare(req.body.password, user.password))) {
-    user.token = uuid.v4(); // Generate a unique authentication token
-    res.cookie(authCookieName, user.token, {
-      httpOnly: true,
-      secure: true, // Set to true in production if using HTTPS
-      sameSite: "strict",
-    });
-    return res.send({ email: user.email });
+  try {
+    const user = users.find((u) => u.email === req.body.email);
+    if (user && (await bcrypt.compare(req.body.password, user.password))) {
+      user.token = uuid.v4();
+      res.cookie(authCookieName, user.token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+      });
+      return res.send({ email: user.email });
+    }
+
+    // Send a 401 Unauthorized status with a JSON response
+    res.status(401).json({ msg: "Unauthorized" }); // Changed this line
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).json({ msg: "Internal server error" });
   }
-  res.status(401).send({ msg: "Unauthorized" });
 });
 
 // User Logout
@@ -105,4 +112,8 @@ app.use((err, req, res, next) => {
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
+});
+
+apiRouter.get("/test", (req, res) => {
+  res.send("Test route working!");
 });

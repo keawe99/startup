@@ -4,9 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import "../styles.css";
 
 export default function LoginPage({ setUsername }) {
-  // Receive setUsername as prop
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
+  const [error, setError] = useState(null);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -22,7 +22,7 @@ export default function LoginPage({ setUsername }) {
   const handleLogout = async () => {
     try {
       await logoutUser();
-      navigate("/"); // Or wherever you want to navigate after logout
+      navigate("/");
     } catch (err) {
       setError(err.message);
     }
@@ -72,7 +72,18 @@ export default function LoginPage({ setUsername }) {
             onChange={handleChange}
           />
           <br /> <br />
-          <button type="submit">Submit</button>
+          {error && (
+            <div className="error-message" style={{ color: "red" }}>
+              {error}
+              {error === "Unauthorized" && (
+                <p>
+                  Don't have an account? <Link to="/signup">Sign up here</Link>.
+                </p>
+              )}
+            </div>
+          )}
+          <button type="submit">Submit</button>{" "}
+          {/* Moved the button inside the form */}
         </form>
       </center>
     </div>
