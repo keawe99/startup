@@ -32,17 +32,10 @@ For this deliverable, I really wanted to focus on displaying the user's username
 
 For this deliverable, I am working on authenticating my users that login or create an account in sneakpeek360. Right now, I am having issues with my backend code with an internal server issue. This issue is specifically with the signUp.jsx file. Revise index.js and/or signUp.jsx files to see if they can fix those issues.
 
-As for loginPage.jsx, I am also having internal server errors. Here is the specific error that arises when I try to login: loginService.js:10
-POST http://localhost:5173/api/auth/login 500 (Internal Server Error)
-loginUser @ loginService.js:10
-handleSubmit @ loginPage.jsx:14
+I have figured out the internal server errors. It is because I was not running my index.js file while running my startup project in dev. I have opened a separate terminal and for everytime I want to dev my project, I run the node js file as well to ensure my data is being passed correctly as I test my project. A user can now sign up for an account in my project and log out if they want to. Right now, I am having trouble figuring out how to get a returning user to log in. Here is the error that I am getting thrown back from the browser's console:
 
-loginService.js:26 Login service error: SyntaxError: Unexpected end of JSON input
-loginUser @ loginService.js:26
-await in loginUser
-handleSubmit @ loginPage.jsx:14
-loginPage.jsx:18 Uncaught (in promise) ReferenceError: setError is not defined
-at handleSubmit (loginPage.jsx:18:7)
-handleSubmit @ loginPage.jsx:18
+loginService.js:26 Login service error: SyntaxError: Failed to execute 'json' on 'Response': Unexpected end of JSON input
+at loginUser (loginService.js:21:40)
+at async handleSubmit (loginPage.jsx:14:20)
 
-Could be because I don't have a current token assigned with my account? In other words, maybe it's because I haven't created an account yet? I doubt that but will need to dive deeper on what is going on. Check on why API (/api/auth/create) isn't registering correctly.
+Also, add a button where once a user logs in they can add photos on the web app. Also add css to the logout button. If time permits, create an account webpage where a user can view and edit their profile information.
