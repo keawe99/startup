@@ -41,3 +41,7 @@ at async handleSubmit (loginPage.jsx:14:20)
 Also, add a button where once a user logs in they can add photos on the web app. Also add css to the logout button. If time permits, create an account webpage where a user can view and edit their profile information.
 
 ADDED https://kickscrew-sneakers-data.p.rapidapi.com/search?query=yeezy%2C%20nike%2C%20new%20balance%2C%20puma%2C%20hoka%2C%20on%2C%20ugg AS BASE API URL
+
+also, for my backend to remember logged out user information, i will need to attach a database for that functionality. looks like we will cover that topic later.
+
+THIRD PARTY ENDPOINT IS WRITTEN IN src/latestDrops/latestDrops.jsx
