@@ -18,13 +18,19 @@ export async function loginUser(formData) {
     if (response.ok) {
       return await response.json();
     } else {
-      const errorData = await response.json();
-      throw new Error(errorData.msg || "Login failed");
+      // Check if the response has content before trying to parse it as JSON
+      const text = await response.text();
+      try {
+        const errorData = JSON.parse(text);
+        throw new Error(errorData.msg || "Login failed");
+      } catch (jsonError) {
+        // If parsing JSON fails, throw a generic error
+        throw new Error("Login failed");
+      }
     }
   } catch (error) {
-    // Log the error for debugging purposes
     console.error("Login service error:", error);
-    throw new Error("Network error or server unavailable"); // More general error for user
+    throw new Error("Network error or server unavailable");
   }
 }
 

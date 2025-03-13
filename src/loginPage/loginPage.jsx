@@ -12,7 +12,7 @@ export default function LoginPage({ setUsername }) {
     event.preventDefault();
     try {
       const data = await loginUser(formData);
-      setUsername(data.email);
+      setUsername(data.email); // Or data.username if you send that back from the server
       navigate("/landingPage");
     } catch (err) {
       setError(err.message);
@@ -55,12 +55,13 @@ export default function LoginPage({ setUsername }) {
           style={{ padding: "20px" }}
           onSubmit={handleSubmit}
         >
-          <label htmlFor="Username">Username </label>
+          <label htmlFor="username">Username </label>{" "}
+          {/* Changed to username */}
           <br />
           <input
             type="text"
-            id="Username"
-            name="Username-id"
+            id="username"
+            name="username" // Changed to username
             onChange={handleChange}
           />
           <br /> <br />
@@ -82,8 +83,7 @@ export default function LoginPage({ setUsername }) {
               )}
             </div>
           )}
-          <button type="submit">Submit</button>{" "}
-          {/* Moved the button inside the form */}
+          <button type="submit">Submit</button>
         </form>
       </center>
     </div>

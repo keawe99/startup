@@ -23,7 +23,12 @@ apiRouter.post("/auth/create", async (req, res) => {
   try {
     // Check if user with the same email already exists
     if (users.find((u) => u.email === req.body.email)) {
-      return res.status(409).json({ msg: "Existing user" });
+      return res.status(409).json({ msg: "Existing email" });
+    }
+
+    // Check if user with the same username already exists
+    if (users.find((u) => u.username === req.body.username)) {
+      return res.status(409).json({ msg: "Existing username" });
     }
 
     // Hash the password
@@ -34,6 +39,7 @@ apiRouter.post("/auth/create", async (req, res) => {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
+      username: req.body.username, // Store username
       password: passwordHash,
       birthday: req.body.birthday,
       nike: req.body.nike,
@@ -41,20 +47,17 @@ apiRouter.post("/auth/create", async (req, res) => {
       nb: req.body.nb,
       yeezy: req.body.yeezy,
       puma: req.body.puma,
-      token: uuid.v4(), // Generate a unique authentication token
+      token: uuid.v4(),
     };
 
-    // Add the new user to the users array
     users.push(newUser);
 
-    // Set the authentication cookie
     res.cookie(authCookieName, newUser.token, {
       httpOnly: true,
-      secure: true, // Set to true in production if using HTTPS
+      secure: true,
       sameSite: "strict",
     });
 
-    // Send a success response
     res.status(201).json({ email: newUser.email });
   } catch (error) {
     console.error("Error creating user:", error);
@@ -65,19 +68,30 @@ apiRouter.post("/auth/create", async (req, res) => {
 // User Login
 apiRouter.post("/auth/login", async (req, res) => {
   try {
-    const user = users.find((u) => u.email === req.body.email);
-    if (user && (await bcrypt.compare(req.body.password, user.password))) {
-      user.token = uuid.v4();
-      res.cookie(authCookieName, user.token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "strict",
-      });
-      return res.send({ email: user.email });
+    console.log("Login attempt for username:", req.body.username); // Log username
+    const user = users.find((u) => u.username === req.body.username); // Find by username
+    if (user) {
+      console.log("User found:", user.username);
+      const passwordMatch = await bcrypt.compare(
+        req.body.password,
+        user.password
+      );
+      if (passwordMatch) {
+        console.log("Password match successful");
+        user.token = uuid.v4();
+        res.cookie(authCookieName, user.token, {
+          httpOnly: true,
+          secure: true,
+          sameSite: "strict",
+        });
+        return res.send({ email: user.email }); // You might want to send back the username here as well
+      } else {
+        console.log("Password match failed");
+      }
+    } else {
+      console.log("User not found");
     }
-
-    // Send a 401 Unauthorized status with a JSON response
-    res.status(401).json({ msg: "Unauthorized" }); // Changed this line
+    res.status(401).json({ msg: "Unauthorized" });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ msg: "Internal server error" });
