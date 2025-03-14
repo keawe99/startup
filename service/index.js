@@ -13,6 +13,8 @@ let users = [];
 // Middleware
 app.use(express.json()); // For parsing JSON request bodies
 app.use(cookieParser());
+// Serve up the front-end static content hosting
+app.use(express.static("public"));
 
 // API Router
 const apiRouter = express.Router();
@@ -130,4 +132,9 @@ app.listen(port, () => {
 
 apiRouter.get("/test", (req, res) => {
   res.send("Test route working!");
+});
+
+// Return the application's default page if the path is unknown
+app.use((_req, res) => {
+  res.sendFile("index.html", { root: "public" });
 });
