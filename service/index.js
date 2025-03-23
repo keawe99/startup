@@ -2,18 +2,34 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs"); // For password hashing
 const uuid = require("uuid"); // For generating unique IDs
+const { MongoClient } = require("mongodb");
 
 const app = express();
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 const authCookieName = "token";
 
-// In-memory user storage (replace with a database in production)
-let users = [];
+// MongoDB Connection
+const url =
+  "mongodb+srv://keawe1999:Dbroncs18!@sneakpeekcluster.hfiui.mongodb.net/?retryWrites=true&w=majority&appName=SneakPeekCluster"; // Replace with your connection string
+const client = new MongoClient(url);
+let usersCollection; // Declare outside the connection to make it accessible
+
+async function connectToDatabase() {
+  try {
+    await client.connect();
+    console.log("Connected to MongoDB");
+    const db = client.db("my_db"); // Replace with your database name
+    usersCollection = db.collection("users");
+  } catch (err) {
+    console.error("Error connecting to MongoDB:", err);
+  }
+}
+
+connectToDatabase(); // Connect when the server starts
 
 // Middleware
-app.use(express.json()); // For parsing JSON request bodies
+app.use(express.json());
 app.use(cookieParser());
-// Serve up the front-end static content hosting
 app.use(express.static("public"));
 
 // API Router
@@ -24,13 +40,11 @@ app.use(`/api`, apiRouter);
 apiRouter.post("/auth/create", async (req, res) => {
   try {
     // Check if user with the same email already exists
-    if (users.find((u) => u.email === req.body.email)) {
+    const existingEmailUser = await usersCollection.findOne({
+      email: req.body.email,
+    });
+    if (existingEmailUser) {
       return res.status(409).json({ msg: "Existing email" });
-    }
-
-    // Check if user with the same username already exists
-    if (users.find((u) => u.username === req.body.username)) {
-      return res.status(409).json({ msg: "Existing username" });
     }
 
     // Hash the password
@@ -41,7 +55,6 @@ apiRouter.post("/auth/create", async (req, res) => {
       firstName: req.body.firstName,
       lastName: req.body.lastName,
       email: req.body.email,
-      username: req.body.username, // Store username
       password: passwordHash,
       birthday: req.body.birthday,
       nike: req.body.nike,
@@ -52,26 +65,63 @@ apiRouter.post("/auth/create", async (req, res) => {
       token: uuid.v4(),
     };
 
-    users.push(newUser);
+    // Insert the new user into the database
+    await usersCollection.insertOne(newUser);
 
     res.cookie(authCookieName, newUser.token, {
       httpOnly: true,
       secure: true,
-      sameSite: "strict",
+      sameSite: "none",
+      domain: "sneakpeek360.com",
     });
 
-    res.status(201).json({ email: newUser.email });
+    res.status(201).json({ email: newUser.email }); // Send only email
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ msg: "Failed to create user" });
   }
 });
 
+// User Username
+apiRouter.post("/auth/username", async (req, res) => {
+  try {
+    const { username, password, email } = req.body; // Receive password
+
+    // Check if the username already exists
+    const existingUsernameUser = await usersCollection.findOne({
+      username: username,
+    });
+    if (existingUsernameUser) {
+      return res.status(409).json({ msg: "Existing username" });
+    }
+
+    // Hash the password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Update the user's username and password in the database
+    const updateResult = await usersCollection.updateOne(
+      { email: email },
+      { $set: { username: username, password: passwordHash } } // Update password
+    );
+
+    if (updateResult.modifiedCount === 1) {
+      res
+        .status(200)
+        .json({ msg: "Username and password updated successfully" });
+    } else {
+      res.status(404).json({ msg: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error updating username:", error);
+    res.status(500).json({ msg: "Failed to update username" });
+  }
+});
+
 // User Login
 apiRouter.post("/auth/login", async (req, res) => {
   try {
-    console.log("Login attempt for username:", req.body.username); // Log username
-    const user = users.find((u) => u.username === req.body.username); // Find by username
+    console.log("Login attempt for username:", req.body.username);
+    const user = await usersCollection.findOne({ username: req.body.username });
     if (user) {
       console.log("User found:", user.username);
       const passwordMatch = await bcrypt.compare(
@@ -81,12 +131,16 @@ apiRouter.post("/auth/login", async (req, res) => {
       if (passwordMatch) {
         console.log("Password match successful");
         user.token = uuid.v4();
+        await usersCollection.updateOne(
+          { _id: user._id },
+          { $set: { token: user.token } }
+        );
         res.cookie(authCookieName, user.token, {
           httpOnly: true,
           secure: true,
           sameSite: "strict",
         });
-        return res.send({ email: user.email }); // You might want to send back the username here as well
+        return res.send({ email: user.email, username: user.username });
       } else {
         console.log("Password match failed");
       }
@@ -100,18 +154,56 @@ apiRouter.post("/auth/login", async (req, res) => {
   }
 });
 
+// User Username
+
+apiRouter.post("/auth/username", async (req, res) => {
+  try {
+    const { username, email } = req.body;
+
+    // Update the user's username in the database
+    const updateResult = await usersCollection.updateOne(
+      { email: email },
+      { $set: { username: username } }
+    );
+
+    if (updateResult.modifiedCount === 1) {
+      res.status(200).json({ msg: "Username updated successfully" });
+    } else {
+      res.status(404).json({ msg: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error updating username:", error);
+    res.status(500).json({ msg: "Failed to update username" });
+  }
+});
+
 // User Logout
-apiRouter.delete("/auth/logout", (req, res) => {
-  res.clearCookie(authCookieName);
-  res.status(204).end();
+apiRouter.delete("/auth/logout", async (req, res) => {
+  try {
+    const token = req.cookies[authCookieName];
+    if (token) {
+      await usersCollection.updateOne({ token }, { $unset: { token: 1 } });
+    }
+    res.clearCookie(authCookieName);
+    res.status(204).end();
+  } catch (error) {
+    console.error("Error during logout:", error);
+    res.status(500).json({ msg: "Internal server error" });
+  }
 });
 
 // Authentication Middleware
-const verifyAuth = (req, res, next) => {
-  if (users.find((u) => u.token === req.cookies[authCookieName])) {
-    next();
-  } else {
-    res.status(401).send({ msg: "Unauthorized" });
+const verifyAuth = async (req, res, next) => {
+  try {
+    const token = req.cookies[authCookieName];
+    if (token && (await usersCollection.findOne({ token }))) {
+      next();
+    } else {
+      res.status(401).send({ msg: "Unauthorized" });
+    }
+  } catch (error) {
+    console.error("Error verifying auth:", error);
+    res.status(500).send({ msg: "Internal server error" });
   }
 };
 

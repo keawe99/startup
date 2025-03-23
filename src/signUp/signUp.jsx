@@ -9,15 +9,17 @@ const SignUp = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log("Form data submitted:", formData); // Log the form data
     try {
       const response = await fetch("/api/auth/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+      console.log("Signup response:", response); // Log the response
       if (response.ok) {
-        navigate("/username");
+        const data = await response.json();
+        navigate("/username", { state: { email: data.email } });
       } else {
         const errorData = await response.json();
         setError(errorData.msg || "Signup failed");

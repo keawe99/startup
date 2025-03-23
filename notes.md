@@ -52,11 +52,6 @@ To address this, you need to use a persistent data storage solution, such as a d
 
 Here's a breakdown of the steps to transition from in-memory storage to a database using MongoDB as an example:
 
-1. Set up MongoDB:
-
-Install MongoDB: If you haven't already, install MongoDB on your system or use a cloud-based MongoDB service (e.g., MongoDB Atlas).
-Start MongoDB: Ensure that your MongoDB server is running. 2. Install Mongoose (for MongoDB interaction):
-
 Install Mongoose: In your project directory, run:
 
 Bash
@@ -206,3 +201,7 @@ Mongoose Models: Mongoose models are used to interact with the database.
 Asynchronous Operations: The code uses async/await for asynchronous database operations.
 Error Handling: Robust error handling is included in the database interactions.
 By making these changes, you will ensure that your user data persists across server restarts, and your users will be able to log back in after logging out.
+
+# DB Notes
+
+A returning user can finally create an account, logout, and log back in! I am super excited about that progress. What I was missing is that in the loginPage.jsx file, I was saving the user's password as "Password" with a capital p. Since the variable that is getting passed is case sensitive, I had to change the variable's name to a lower-case p. Now that I have figured that error out, a user can log back in. Super stoked!

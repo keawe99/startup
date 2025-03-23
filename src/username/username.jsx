@@ -1,24 +1,35 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles.css";
 
 const Username = ({ setUsername }) => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({});
+  const [username, setUsernameInput] = useState("");
+  const [password, setPasswordInput] = useState(""); // Add password state
+  const location = useLocation();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form Data:", formData);
-    if (formData["Username-id"]) {
-      setUsername(formData["Username-id"]);
-      navigate("/landingPage"); // Navigate after setting username
-    } else {
-      alert("Please enter a username.");
-    }
-  };
+    try {
+      const response = await fetch("/api/auth/username", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: username,
+          password: password, // Send password
+          email: location.state.email,
+        }),
+      });
 
-  const handleChange = (event) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
+      if (response.ok) {
+        setUsername(username);
+        navigate("/landingPage");
+      } else {
+        alert("Failed to create username.");
+      }
+    } catch (err) {
+      alert("Network error.");
+    }
   };
 
   return (
@@ -40,20 +51,20 @@ const Username = ({ setUsername }) => {
       </h3>
       <center>
         <form className="styled-form" onSubmit={handleSubmit}>
-          <label htmlFor="Username">Username </label>
+          <label htmlFor="username">Username </label>
           <input
             type="text"
-            id="Username"
-            name="Username-id"
-            onChange={handleChange}
+            id="username"
+            name="username"
+            onChange={(e) => setUsernameInput(e.target.value)}
           />
           <br /> <br />
-          <label htmlFor="Password">Password </label>
+          <label htmlFor="password">Password </label>
           <input
             type="password"
-            id="Password"
-            name="Password"
-            onChange={handleChange}
+            id="password"
+            name="password"
+            onChange={(e) => setPasswordInput(e.target.value)}
           />
           <br /> <br />
           <button style={{ position: "right" }} type="submit">

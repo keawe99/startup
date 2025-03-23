@@ -12,7 +12,7 @@ export default function LoginPage({ setUsername }) {
     event.preventDefault();
     try {
       const data = await loginUser(formData);
-      setUsername(data.email); // Or data.username if you send that back from the server
+      setUsername(data.username); // Or data.username if you send that back from the server
       navigate("/landingPage");
     } catch (err) {
       setError(err.message);
@@ -68,8 +68,8 @@ export default function LoginPage({ setUsername }) {
           <label htmlFor="Password">Password </label> <br />
           <input
             type="password"
-            id="Password"
-            name="Password"
+            id="password"
+            name="password"
             onChange={handleChange}
           />
           <br /> <br />

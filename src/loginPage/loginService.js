@@ -16,7 +16,8 @@ export async function loginUser(formData) {
     });
 
     if (response.ok) {
-      return await response.json();
+      const userData = await response.json();
+      return userData; // Return the entire userData object
     } else {
       // Check if the response has content before trying to parse it as JSON
       const text = await response.text();
