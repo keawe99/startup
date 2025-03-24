@@ -205,3 +205,9 @@ By making these changes, you will ensure that your user data persists across ser
 # DB Notes
 
 A returning user can finally create an account, logout, and log back in! I am super excited about that progress. What I was missing is that in the loginPage.jsx file, I was saving the user's password as "Password" with a capital p. Since the variable that is getting passed is case sensitive, I had to change the variable's name to a lower-case p. Now that I have figured that error out, a user can log back in. Super stoked!
+
+With the API, I need to figure out how to get the images to display. I will try to work through it so that I can get images to pop up along with their release dates. If not, look for other APIs.
+
+LOOK FOR NEW API!! CURRENT ONE NOT AS RELIABLE AS I WOULD LIKE TO BE.
+
+UPLOAD PHOTO page is working but need to work on actually uploading the photos right. Look more into that.

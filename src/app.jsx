@@ -8,6 +8,7 @@ import SignUp from "./signUp/signUp.jsx";
 import LandingPage from "./landingPage/landingPage.jsx";
 import LatestDrops from "./latestDrops/latestDrops.jsx";
 import Username from "./username/username.jsx";
+import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
 
 const Home = () => {
   return (
@@ -117,6 +118,7 @@ export default function App() {
               path="/username"
               element={<Username setUsername={setUsername} />}
             />
+            <Route path="/uploadPhoto" element={<UploadPage />} />
           </Routes>
         </div>
       </div>

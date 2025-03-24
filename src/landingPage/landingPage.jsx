@@ -84,6 +84,9 @@ const LandingPage = ({ username, setUsername }) => {
       <div className="user-info-column">
         <h3 className="heading">Welcome {username || "User!"}!</h3>
         <button onClick={handleLogout}>Logout</button>
+        <Link to="/uploadPhoto">
+          <button>Upload Photo</button>
+        </Link>
       </div>
     </div>
   );

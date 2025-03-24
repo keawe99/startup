@@ -17,6 +17,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.772.0",
     "@aws-sdk/credential-providers": "^3.772.0",
+    "aws-sdk": "^2.1692.0",
     "axios": "^1.8.3",
     "bcryptjs": "^3.0.2",
     "bootstrap": "^5.3.3",
@@ -29,6 +30,7 @@
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.5",
     "react-scripts": "^5.0.1",
+    "sneaks-api": "^1.2.3",
     "uuid": "^11.1.0"
   }
 }
