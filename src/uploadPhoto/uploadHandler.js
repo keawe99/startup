@@ -17,8 +17,7 @@ const s3 = new AWS.S3({
 });
 
 // Configure MongoDB
-const url =
-  process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
 let postsCollection;
 
