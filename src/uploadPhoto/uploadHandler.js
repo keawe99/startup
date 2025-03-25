@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const AWS = require("aws-sdk");
 const { MongoClient } = require("mongodb");
+require("dotenv").config({ path: ".env.local" });
 
 const router = express.Router(); // Create an Express router
 

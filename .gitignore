@@ -1,3 +1,5 @@
 node_modules/
 dbConfig.json
 database.js
+.env
+.env.local
