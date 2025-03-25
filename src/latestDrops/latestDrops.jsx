@@ -3,13 +3,15 @@ import axios from "axios";
 import "../styles.css";
 
 const LatestDrops = () => {
-  const [sneakers, setSneakers] = useState([]);
+  const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState(
+    "yeezy, nike, puma, on, hoka, adidas, new balance, ugg"
+  ); // Example search term
 
   useEffect(() => {
-    const fetchSneakers = async () => {
+    const fetchSearchResults = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -18,7 +20,7 @@ const LatestDrops = () => {
           `http://localhost:4001/api/sneakers?searchTerm=${searchTerm}`
         );
         console.log("Backend API Response:", response.data);
-        setSneakers(response.data);
+        setSearchResults(response.data);
         setLoading(false);
       } catch (err) {
         setError(err);
@@ -26,7 +28,7 @@ const LatestDrops = () => {
       }
     };
 
-    fetchSneakers();
+    fetchSearchResults();
   }, [searchTerm]);
 
   const handleSearchChange = (event) => {
@@ -35,11 +37,11 @@ const LatestDrops = () => {
 
   return (
     <div className="latest-drops-container">
-      <h2>Latest Sneaker Drops</h2>
+      <h2>Sneaker Search Results</h2>
       <div className="search-bar">
         <input
           type="text"
-          placeholder="Search for brands or keywords..."
+          placeholder="Search for sneakers..."
           value={searchTerm}
           onChange={handleSearchChange}
         />
@@ -48,25 +50,23 @@ const LatestDrops = () => {
       <br />
       {loading && <div className="loading">Loading...</div>}
       {error && <div className="error">Error: {error.message}</div>}
-      <div className="sneaker-grid">
-        {sneakers.map((sneaker) => (
-          <div key={sneaker.styleID} className="sneaker-card">
-            {sneaker.image && (
+      {searchResults &&
+        searchResults.map((sneaker) => (
+          <div key={sneaker.uuid} className="sneaker-card">
+            {sneaker.media.imageUrl && (
               <img
-                src={sneaker.image}
-                alt={sneaker.shoeName}
+                src={sneaker.media.imageUrl}
+                alt={sneaker.title}
                 className="sneaker-image"
               />
             )}
-            <br />
-            <h3 className="sneaker-name">{sneaker.shoeName}</h3>
+            <h3 className="sneaker-name">{sneaker.title}</h3>
             <p>Colorway: {sneaker.colorway}</p>
             <p>Release Date: {sneaker.releaseDate}</p>
             <p>Retail Price: {sneaker.retailPrice}</p>
-            <p>Style ID: {sneaker.styleID}</p>
+            <p>Style ID: {sneaker.styleId}</p>
           </div>
         ))}
-      </div>
     </div>
   );
 };

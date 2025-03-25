@@ -45,7 +45,7 @@ A returning user can finally create an account, logout, and log back in! I am su
 
 With the API, I need to figure out how to get the images to display. I will try to work through it so that I can get images to pop up along with their release dates. If not, look for other APIs.
 
-LOOK FOR NEW API!! CURRENT ONE NOT AS RELIABLE AS I WOULD LIKE TO BE. (check out this one: https://github.com/HoseaCodes/Sneaker-Api)
+LOOK FOR NEW API!! CURRENT ONE NOT AS RELIABLE AS I WOULD LIKE TO BE.
 
 UPLOAD PHOTO WORKS! FOCUS ON API NOW!!
 
