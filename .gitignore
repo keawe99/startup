@@ -1,4 +1,3 @@
 node_modules/
 dbConfig.json
 database.js
-uploadHandler.js
