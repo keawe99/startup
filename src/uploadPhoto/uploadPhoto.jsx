@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const UploadPage = () => {
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState("");
+  const navigate = useNavigate(); // Get the navigate function
 
   const handleImageChange = (event) => {
     setImage(event.target.files[0]);
@@ -28,8 +30,12 @@ const UploadPage = () => {
       });
       // Handle success (e.g., show a message, redirect)
       console.log("Image uploaded:", response.data.imageUrl);
+
+      // Redirect to the landing page
+      navigate("/landingPage");
     } catch (error) {
       // Handle error
+      console.error("Upload failed:", error);
     }
   };
 

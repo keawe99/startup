@@ -47,6 +47,6 @@ With the API, I need to figure out how to get the images to display. I will try 
 
 LOOK FOR NEW API!! CURRENT ONE NOT AS RELIABLE AS I WOULD LIKE TO BE. (check out this one: https://github.com/HoseaCodes/Sneaker-Api)
 
-UPLOAD PHOTO page is working but need to work on actually uploading the photos right. Look more into that.
+UPLOAD PHOTO WORKS! FOCUS ON API NOW!!
 
 For Later: add a button where once a user logs in they can add photos on the web app. Also add css to the logout button. If time permits, create an account webpage where a user can view and edit their profile information.

@@ -19,6 +19,7 @@ const SignUp = () => {
       console.log("Signup response:", response); // Log the response
       if (response.ok) {
         const data = await response.json();
+        console.log("Signup successful, navigating to /username");
         navigate("/username", { state: { email: data.email } });
       } else {
         const errorData = await response.json();

@@ -1,16 +1,29 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
-const bcrypt = require("bcryptjs"); // For password hashing
-const uuid = require("uuid"); // For generating unique IDs
+const bcrypt = require("bcryptjs");
+const uuid = require("uuid");
 const { MongoClient } = require("mongodb");
+const cors = require("cors");
+const uploadHandler = require("../src/uploadPhoto/uploadHandler");
+const path = require("path");
+const fs = require("fs");
+
+const envPath = path.resolve(__dirname, "..", ".env.local");
+require("dotenv").config({ path: envPath });
+
+try {
+  const data = fs.readFileSync(".env.local", "utf8");
+  console.log("env.local contents:", data);
+} catch (err) {
+  console.error("Error reading env.local file:", err);
+}
 
 const app = express();
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 const authCookieName = "token";
 
 // MongoDB Connection
-const url =
-  "mongodb+srv://keawe1999:Dbroncs18!@sneakpeekcluster.hfiui.mongodb.net/?retryWrites=true&w=majority&appName=SneakPeekCluster"; // Replace with your connection string
+const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
 let usersCollection; // Declare outside the connection to make it accessible
 
@@ -32,9 +45,19 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("public"));
 
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Your client's origin
+    credentials: true, // Allow cookies to be sent
+  })
+);
+
 // API Router
 const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
+
+// Use the upload handler
+app.use("/api/upload", uploadHandler);
 
 // User Registration
 apiRouter.post("/auth/create", async (req, res) => {
@@ -62,18 +85,13 @@ apiRouter.post("/auth/create", async (req, res) => {
       nb: req.body.nb,
       yeezy: req.body.yeezy,
       puma: req.body.puma,
-      token: uuid.v4(),
+      // Removed token from here
     };
 
     // Insert the new user into the database
     await usersCollection.insertOne(newUser);
 
-    res.cookie(authCookieName, newUser.token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "none",
-      domain: "sneakpeek360.com",
-    });
+    // Removed cookie setting from here
 
     res.status(201).json({ email: newUser.email }); // Send only email
   } catch (error) {
@@ -101,10 +119,18 @@ apiRouter.post("/auth/username", async (req, res) => {
     // Update the user's username and password in the database
     const updateResult = await usersCollection.updateOne(
       { email: email },
-      { $set: { username: username, password: passwordHash } } // Update password
+      { $set: { username: username, password: passwordHash, token: uuid.v4() } } // Update password and token
     );
 
     if (updateResult.modifiedCount === 1) {
+      // Set the cookie here
+      res.cookie(authCookieName, uuid.v4(), {
+        httpOnly: true,
+        secure: true,
+        sameSite: "Lax",
+        domain: "localhost",
+        path: "/",
+      });
       res
         .status(200)
         .json({ msg: "Username and password updated successfully" });
@@ -138,7 +164,7 @@ apiRouter.post("/auth/login", async (req, res) => {
         res.cookie(authCookieName, user.token, {
           httpOnly: true,
           secure: true,
-          sameSite: "strict",
+          sameSite: "Lax",
         });
         return res.send({ email: user.email, username: user.username });
       } else {
@@ -151,29 +177,6 @@ apiRouter.post("/auth/login", async (req, res) => {
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ msg: "Internal server error" });
-  }
-});
-
-// User Username
-
-apiRouter.post("/auth/username", async (req, res) => {
-  try {
-    const { username, email } = req.body;
-
-    // Update the user's username in the database
-    const updateResult = await usersCollection.updateOne(
-      { email: email },
-      { $set: { username: username } }
-    );
-
-    if (updateResult.modifiedCount === 1) {
-      res.status(200).json({ msg: "Username updated successfully" });
-    } else {
-      res.status(404).json({ msg: "User not found" });
-    }
-  } catch (error) {
-    console.error("Error updating username:", error);
-    res.status(500).json({ msg: "Failed to update username" });
   }
 });
 
@@ -246,7 +249,4 @@ apiRouter.get("/test", (req, res) => {
   res.send("Test route working!");
 });
 
-// Return the application's default page if the path is unknown
-app.use((_req, res) => {
-  res.sendFile("index.html", { root: "public" });
-});
+// Return the application's default

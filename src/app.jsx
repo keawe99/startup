@@ -10,6 +10,7 @@ import LatestDrops from "./latestDrops/latestDrops.jsx";
 import Username from "./username/username.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
 import ProtectedRoute from "./protectedRoute/protectedRoute.jsx";
+import Cookies from "js-cookie"; // Import js-cookie
 
 const Home = () => {
   return (
@@ -56,19 +57,24 @@ const Home = () => {
 export default function App() {
   const [username, setUsername] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [renderKey, setRenderKey] = useState(0); // Add renderKey state
 
   useEffect(() => {
-    // Check if user is logged in (e.g., check for token in cookies)
-    const token = document.cookie.replace(
-      /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
-      "$1"
-    );
+    const token = Cookies.get("token");
     if (token) {
       setIsAuthenticated(true);
     } else {
       setIsAuthenticated(false);
     }
-  }, []);
+  }, [renderKey]); // Add renderKey to dependency array
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleUsernameSet = () => {
+    setRenderKey((prevKey) => prevKey + 1); // Force re-render
+  };
 
   return (
     <BrowserRouter>
@@ -107,7 +113,9 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route
               path="/loginPage"
-              element={<LoginPage setUsername={setUsername} />}
+              element={
+                <LoginPage setUsername={setUsername} onLogin={handleLogin} />
+              }
             />
             <Route path="/aboutUs" element={<AboutUs />} />
             <Route path="/signUp" element={<SignUp />} />
@@ -134,10 +142,9 @@ export default function App() {
             <Route
               path="/username"
               element={
-                <ProtectedRoute
-                  isAuthenticated={isAuthenticated}
-                  element={Username}
+                <Username
                   setUsername={setUsername}
+                  onUsernameSet={handleUsernameSet}
                 />
               }
             />

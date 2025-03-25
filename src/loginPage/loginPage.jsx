@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { loginUser, logoutUser } from "./loginService";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles.css";
+import Cookies from "js-cookie"; // Import js-cookie
 
-export default function LoginPage({ setUsername }) {
+export default function LoginPage({ setUsername, onLogin }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
@@ -11,8 +12,10 @@ export default function LoginPage({ setUsername }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const data = await loginUser(formData);
-      setUsername(data.username); // Or data.username if you send that back from the server
+      const userData = await loginUser(formData);
+      Cookies.set("token", userData.token); // Use js-cookie
+      setUsername(userData.username);
+      onLogin(); // Update isAuthenticated in App
       navigate("/landingPage");
     } catch (err) {
       setError(err.message);
@@ -22,6 +25,7 @@ export default function LoginPage({ setUsername }) {
   const handleLogout = async () => {
     try {
       await logoutUser();
+      Cookies.remove("token"); // Use js-cookie
       navigate("/");
     } catch (err) {
       setError(err.message);
@@ -55,13 +59,12 @@ export default function LoginPage({ setUsername }) {
           style={{ padding: "20px" }}
           onSubmit={handleSubmit}
         >
-          <label htmlFor="username">Username </label>{" "}
-          {/* Changed to username */}
+          <label htmlFor="username">Username </label>
           <br />
           <input
             type="text"
             id="username"
-            name="username" // Changed to username
+            name="username"
             onChange={handleChange}
           />
           <br /> <br />

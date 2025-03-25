@@ -1,23 +1,21 @@
 const express = require("express");
 const multer = require("multer");
-const AWS = require("aws-sdk");
+const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3"); // Import v3 modules
 const { MongoClient } = require("mongodb");
 require("dotenv").config({ path: ".env.local" });
 
-const router = express.Router(); // Create an Express router
-
-// Configure Multer for file uploads
+const router = express.Router();
 const upload = multer({ storage: multer.memoryStorage() });
 
-// Configure AWS S3
-const s3 = new AWS.S3({
-  // Will need to create S3 Bucket!
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+// Configure AWS S3 v3
+const s3Client = new S3Client({
   region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  },
 });
 
-// Configure MongoDB
 const url = process.env.MONGODB_URI;
 const client = new MongoClient(url);
 let postsCollection;
@@ -34,7 +32,6 @@ async function connectToDatabase() {
 
 connectToDatabase();
 
-// Define the /api/upload route
 router.post("/", upload.single("image"), async (req, res) => {
   try {
     const params = {
@@ -44,22 +41,22 @@ router.post("/", upload.single("image"), async (req, res) => {
       ContentType: req.file.mimetype,
     };
 
-    const s3UploadResult = await s3.upload(params).promise();
+    const command = new PutObjectCommand(params); // Create v3 command
+    const s3UploadResult = await s3Client.send(command); // Send v3 command
 
     const postData = {
-      imageUrl: s3UploadResult.Location,
+      imageUrl: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${params.Key}`, // Construct URL
       description: req.body.description,
-      userId: req.body.userId, // Assuming you have user authentication
-      // Add other post data
+      userId: req.body.userId,
     };
 
     await postsCollection.insertOne(postData);
 
-    res.json({ imageUrl: s3UploadResult.Location });
+    res.json({ imageUrl: postData.imageUrl });
   } catch (error) {
     console.error("Error uploading to S3 or storing post:", error);
     res.status(500).json({ error: "Failed to upload image or store post" });
   }
 });
 
-module.exports = router; // Export the router
+module.exports = router;

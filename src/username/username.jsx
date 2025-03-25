@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles.css";
+import Cookies from "js-cookie";
 
-const Username = ({ setUsername }) => {
+const Username = ({ setUsername, onUsernameSet }) => {
   const navigate = useNavigate();
   const [username, setUsernameInput] = useState("");
-  const [password, setPasswordInput] = useState(""); // Add password state
+  const [password, setPasswordInput] = useState("");
   const location = useLocation();
 
   const handleSubmit = async (event) => {
@@ -16,13 +17,15 @@ const Username = ({ setUsername }) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: username,
-          password: password, // Send password
+          password: password,
           email: location.state.email,
         }),
       });
 
       if (response.ok) {
         setUsername(username);
+        console.log("Username created, cookie set:", Cookies.get("token"));
+        onUsernameSet(); // Trigger re-render in App.jsx
         navigate("/landingPage");
       } else {
         alert("Failed to create username.");
