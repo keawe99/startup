@@ -206,10 +206,30 @@ const verifyAuth = async (req, res, next) => {
     res.status(500).send({ msg: "Internal server error" });
   }
 };
+//Protected Routes
 
-// Protected Route Example
-apiRouter.get("/protected", verifyAuth, (req, res) => {
-  res.send({ msg: "Protected resource accessed." });
+// Landing Page Route (Example)
+apiRouter.get("/landingPage", verifyAuth, (req, res) => {
+  // Your landing page logic here
+  res.send({ msg: "Landing page data" });
+});
+
+// Upload Photo Route (Example)
+apiRouter.get("/uploadPhoto", verifyAuth, (req, res) => {
+  // Your upload photo logic here
+  res.send({ msg: "Upload photo data" });
+});
+
+// Latest Drops Route (Example)
+apiRouter.get("/latestDrops", verifyAuth, (req, res) => {
+  // Your latest drops logic here
+  res.send({ msg: "Latest drops data" });
+});
+
+// Username Route (Example)
+apiRouter.get("/username", verifyAuth, (req, res) => {
+  // Your username logic here
+  res.send({ msg: "Username data" });
 });
 
 // Default Error Handler

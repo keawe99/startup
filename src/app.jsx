@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
-import { BrowserRouter, NavLink, Route, Routes, Link } from "react-router-dom";
+import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import LoginPage from "./loginPage/loginPage.jsx";
 import AboutUs from "./aboutUs/aboutUs.jsx";
 import SignUp from "./signUp/signUp.jsx";
@@ -9,6 +9,7 @@ import LandingPage from "./landingPage/landingPage.jsx";
 import LatestDrops from "./latestDrops/latestDrops.jsx";
 import Username from "./username/username.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
+import ProtectedRoute from "./protectedRoute/protectedRoute.jsx";
 
 const Home = () => {
   return (
@@ -52,16 +53,22 @@ const Home = () => {
   );
 };
 
-function NotFound() {
-  return (
-    <main className="container-fluid bg-secondary text-center">
-      404: Return to sender. Address unknown.
-    </main>
-  );
-}
-
 export default function App() {
   const [username, setUsername] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in (e.g., check for token in cookies)
+    const token = document.cookie.replace(
+      /(?:(?:^|.*;\s*)token\s*\=\s*([^;]*).*$)|^.*$/,
+      "$1"
+    );
+    if (token) {
+      setIsAuthenticated(true);
+    } else {
+      setIsAuthenticated(false);
+    }
+  }, []);
 
   return (
     <BrowserRouter>
@@ -107,18 +114,42 @@ export default function App() {
             <Route
               path="/landingPage"
               element={
-                <LandingPage
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={LandingPage}
                   username={username}
-                  setUsername={setUsername} // Pass setUsername to LandingPage
+                  setUsername={setUsername}
                 />
               }
             />
-            <Route path="/latestDrops" element={<LatestDrops />} />
+            <Route
+              path="/latestDrops"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={LatestDrops}
+                />
+              }
+            />
             <Route
               path="/username"
-              element={<Username setUsername={setUsername} />}
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={Username}
+                  setUsername={setUsername}
+                />
+              }
             />
-            <Route path="/uploadPhoto" element={<UploadPage />} />
+            <Route
+              path="/uploadPhoto"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={UploadPage}
+                />
+              }
+            />
           </Routes>
         </div>
       </div>
