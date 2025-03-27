@@ -1,8 +1,17 @@
 const { MongoClient } = require("mongodb");
+const fs = require("fs");
 
-// Replace with your actual connection string
-const url =
-  "mongodb+srv://keawe1999:Dbroncs18!@sneakpeekcluster.hfiui.mongodb.net/?retryWrites=true&w=majority&appName=SneakPeekCluster";
+// Read config from dbConfig.json
+let config;
+try {
+  config = JSON.parse(fs.readFileSync("./dbConfig.json", "utf8"));
+} catch (err) {
+  console.error("Error reading dbConfig.json:", err);
+  process.exit(1); // Exit if config cannot be loaded
+}
+
+// Access MongoDB URI from config
+const url = config.MONGODB_URI;
 
 async function main() {
   const client = new MongoClient(url);
@@ -11,8 +20,8 @@ async function main() {
     await client.connect();
     console.log("Connected successfully to server");
 
-    const db = client.db("my_db"); // Use the 'my_db' database
-    const usersCollection = db.collection("users"); // Use the 'users' collection
+    const db = client.db(config.MONGODB_DB_NAME); // Use database name from config
+    const usersCollection = db.collection("users"); // Use 'users' collection
 
     // Insert a new user document with all your desired fields
     const insertResult = await usersCollection.insertOne({

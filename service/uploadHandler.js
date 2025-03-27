@@ -19,6 +19,7 @@ const s3Client = new S3Client({
   },
 });
 
+//console.log("MONGODB_URI from dbConfig.json:", config.MONGODB_URI);
 const url = config.MONGODB_URI;
 const client = new MongoClient(url);
 let postsCollection;

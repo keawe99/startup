@@ -4,28 +4,32 @@ const bcrypt = require("bcryptjs");
 const uuid = require("uuid");
 const { MongoClient } = require("mongodb");
 const cors = require("cors");
-const uploadHandler = require("../src/uploadPhoto/uploadHandler");
+const uploadHandler = require("./uploadHandler");
 const path = require("path");
 const fs = require("fs");
-
-const envPath = path.resolve(__dirname, "..", ".env.local");
-require("dotenv").config({ path: envPath });
-
-try {
-  const data = fs.readFileSync(".env.local", "utf8");
-  console.log("env.local contents:", data);
-} catch (err) {
-  console.error("Error reading env.local file:", err);
-}
 
 const app = express();
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
 const authCookieName = "token";
 
+// Read dbConfig.json
+const config = JSON.parse(fs.readFileSync("./dbConfig.json", "utf8"));
+
 // MongoDB Connection
-const url = process.env.MONGODB_URI;
+const url = config.MONGODB_URI;
 const client = new MongoClient(url);
-let usersCollection; // Declare outside the connection to make it accessible
+let usersCollection;
+
+async function connectToDatabase() {
+  try {
+    await client.connect();
+    console.log("Connected to MongoDB");
+    const db = client.db(config.MONGODB_DB_NAME);
+    usersCollection = db.collection("users");
+  } catch (err) {
+    console.error("Error connecting to MongoDB:", err);
+  }
+}
 
 async function connectToDatabase() {
   try {

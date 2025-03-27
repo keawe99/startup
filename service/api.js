@@ -1,15 +1,26 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
-require("dotenv").config({ path: ".env.local" });
+const fs = require("fs");
 
 const app = express();
 const port = 4001;
 
 app.use(cors());
 
+// Read config from dbConfig.json
+let config;
+try {
+  config = JSON.parse(fs.readFileSync("./dbConfig.json", "utf8"));
+} catch (err) {
+  console.error("Error reading dbConfig.json:", err);
+  process.exit(1); // Exit if config cannot be loaded
+}
+
 app.get("/api/sneakers", async (req, res) => {
   const searchTerm = req.query.searchTerm; // Get search term from query
+
+  console.log("Received searchTerm:", searchTerm);
 
   if (!searchTerm) {
     return res.status(400).json({ error: "searchTerm parameter is required" });
@@ -17,44 +28,41 @@ app.get("/api/sneakers", async (req, res) => {
 
   const options = {
     method: "GET",
-    url: "https://sneaker-database-stockx.p.rapidapi.com/stockx/sneakers", // Use "Stockx Sneakers Only" endpoint
+    url: "https://kickscrew-sneakers-data.p.rapidapi.com/search",
     params: {
-      query: searchTerm, // Pass the search term
+      query: searchTerm,
     },
     headers: {
-      "X-RapidAPI-Key": process.env.SNEAKERS_API_KEY,
-      "X-RapidAPI-Host": "sneaker-database-stockx.p.rapidapi.com",
+      "X-RapidAPI-Key": config.SNEAKERS_API_KEY,
+      "X-RapidAPI-Host": "kickscrew-sneakers-data.p.rapidapi.com",
     },
   };
 
+  console.log("Axios options:", options);
+
   try {
     const response = await axios.request(options);
-    const results = response.data.results; // Access the 'results' array
+
+    console.log("Kickscrew API Response:", response.data); // Log the response
+
+    const results = response.data.products; // Corrected access here
 
     if (!results || !Array.isArray(results)) {
-      // Handle cases where response.data.results is null or not an array
       return res.status(500).json({ error: "Invalid API response format" });
     }
 
-    res.json(results); // Send the 'results' array to the frontend
+    res.status(200).json(results); // Changed to 200 status code
   } catch (error) {
     console.error("RapidAPI Error:", error);
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      res.status(error.response.status).json({
-        error: "API request failed",
-        details: error.response.data,
-      });
+      console.error("Response data:", error.response.data);
+      console.error("Response status:", error.response.status);
     } else if (error.request) {
-      // The request was made but no response was received
-      res.status(500).json({ error: "No response from API" });
-    } else {
-      // Something happened in setting up the request that triggered an Error
-      res
-        .status(500)
-        .json({ error: "Request setup error", details: error.message });
+      console.error("Request:", error.request);
     }
+    res
+      .status(500)
+      .json({ error: "Request setup error", details: error.message });
   }
 });
 
