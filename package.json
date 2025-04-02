@@ -33,6 +33,7 @@
     "react-router-dom": "^7.1.5",
     "react-scripts": "^5.0.1",
     "sneaks-api": "^1.2.3",
-    "uuid": "^11.1.0"
+    "uuid": "^11.1.0",
+    "ws": "^8.18.1"
   }
 }

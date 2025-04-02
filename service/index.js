@@ -7,6 +7,7 @@ const cors = require("cors");
 const uploadHandler = require("./uploadHandler");
 const path = require("path");
 const fs = require("fs");
+const { WebSocketServer } = require("ws"); // Import WebSocketServer
 
 const app = express();
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
@@ -237,6 +238,36 @@ apiRouter.get("/latestDrops", verifyAuth, (req, res) => {
 apiRouter.get("/username", verifyAuth, (req, res) => {
   // Your username logic here
   res.send({ msg: "Username data" });
+});
+
+// WebSocket Setup
+const server = app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+
+const wss = new WebSocketServer({ server });
+
+// Pass wss to the uploadHandler module
+app.use("/api/upload", uploadHandler(wss));
+
+wss.on("connection", (ws) => {
+  console.log("Client connected via WebSocket");
+
+  ws.on("message", (message) => {
+    const data = JSON.parse(message.toString()); // Parse message as JSON
+    console.log(`Received message: ${JSON.stringify(data)}`);
+
+    // Broadcast the message to all connected clients
+    wss.clients.forEach((client) => {
+      if (client !== ws && client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(data)); // Send as JSON
+      }
+    });
+  });
+
+  ws.on("close", () => {
+    console.log("Client disconnected from WebSocket");
+  });
 });
 
 // Default Error Handler

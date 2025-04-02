@@ -50,3 +50,30 @@ LOOK FOR NEW API!! CURRENT ONE NOT AS RELIABLE AS I WOULD LIKE TO BE.
 UPLOAD PHOTO WORKS! FOCUS ON API NOW!!
 
 For Later: add a button where once a user logs in they can add photos on the web app. Also add css to the logout button. If time permits, create an account webpage where a user can view and edit their profile information.
+
+#WebSocket Notes
+
+I am currently adding functionality so that when a user posts their pictures, websocket can take it and display them on landingPage.jsx. May take some time, but I am currently configuring index.js, uploadHandler.js, and landingPage.jsx. I have made changes in the vite.config.js and package.json files to accept WebSocket, and have downloaded packages from npm into my project so I have access to it.
+
+Right now I am getting this error:
+
+stevenarmstrong@Stevens-MacBook-Air-2 service % node index.js
+/Users/stevenarmstrong/cs260/startup/service/node_modules/express/lib/router/index.js:646
+return fn.apply(this, arguments);
+^
+
+TypeError: Cannot read properties of undefined (reading 'apply')
+at /Users/stevenarmstrong/cs260/startup/service/node_modules/express/lib/router/index.js:646:15
+at next (/Users/stevenarmstrong/cs260/startup/service/node_modules/express/lib/router/index.js:216:14)
+at Function.handle (/Users/stevenarmstrong/cs260/startup/service/node_modules/express/lib/router/index.js:175:3)
+at router (/Users/stevenarmstrong/cs260/startup/service/node_modules/express/lib/router/index.js:47:12)
+at Object.<anonymous> (/Users/stevenarmstrong/cs260/startup/service/index.js:251:24)
+at Module.\_compile (node:internal/modules/cjs/loader:1241:14)
+at Module.\_extensions..js (node:internal/modules/cjs/loader:1295:10)
+at Module.load (node:internal/modules/cjs/loader:1091:32)
+at Module.\_load (node:internal/modules/cjs/loader:938:12)
+at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:83:12)
+
+Node.js v20.9.0
+
+origin of error is on line 251 of index.js file, will need to check up on uploadHandler.js file to make sure wss is being passed correctly. Check chat with Gemini to troubleshoot further this issue.

@@ -5,9 +5,22 @@ import "../styles.css";
 
 const LandingPage = ({ username, setUsername }) => {
   const navigate = useNavigate();
+  const [posts, setPosts] = useState([]);
+  const socket = new WebSocket("ws://localhost:4000/ws"); // Connect to your WebSocket server
 
   useEffect(() => {
     console.log("Username prop in LandingPage:", username);
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "newPost") {
+        setPosts((prevPosts) => [message.post, ...prevPosts]); // Add new post to the beginning
+      }
+    };
+
+    return () => {
+      socket.close();
+    };
   }, [username]);
 
   const handleLogout = async () => {
