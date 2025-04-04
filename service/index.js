@@ -61,9 +61,6 @@ app.use(
 const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
-// Use the upload handler
-app.use("/api/upload", uploadHandler);
-
 // User Registration
 apiRouter.post("/auth/create", async (req, res) => {
   try {
@@ -247,8 +244,10 @@ const server = app.listen(port, () => {
 
 const wss = new WebSocketServer({ server });
 
-// Pass wss to the uploadHandler module
+// Use the upload handler
 app.use("/api/upload", uploadHandler(wss));
+
+// Pass wss to the uploadHandler module
 
 wss.on("connection", (ws) => {
   console.log("Client connected via WebSocket");
@@ -274,10 +273,6 @@ wss.on("connection", (ws) => {
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).send({ type: err.name, message: err.message });
-});
-
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
 });
 
 apiRouter.get("/test", (req, res) => {

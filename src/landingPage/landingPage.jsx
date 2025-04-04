@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../loginPage/loginService";
 import "../styles.css";
@@ -6,7 +6,7 @@ import "../styles.css";
 const LandingPage = ({ username, setUsername }) => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
-  const socket = new WebSocket("ws://localhost:4000/ws"); // Connect to your WebSocket server
+  const socket = new WebSocket("ws://localhost:4000/ws");
 
   useEffect(() => {
     console.log("Username prop in LandingPage:", username);
