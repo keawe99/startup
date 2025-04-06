@@ -20,24 +20,15 @@ const config = JSON.parse(fs.readFileSync("./dbConfig.json", "utf8"));
 const url = config.MONGODB_URI;
 const client = new MongoClient(url);
 let usersCollection;
+let postsCollection; // Add postsCollection here
 
 async function connectToDatabase() {
   try {
     await client.connect();
     console.log("Connected to MongoDB");
-    const db = client.db(config.MONGODB_DB_NAME);
+    const db = client.db(config.MONGODB_DB_NAME); // Replace with your database name
     usersCollection = db.collection("users");
-  } catch (err) {
-    console.error("Error connecting to MongoDB:", err);
-  }
-}
-
-async function connectToDatabase() {
-  try {
-    await client.connect();
-    console.log("Connected to MongoDB");
-    const db = client.db("my_db"); // Replace with your database name
-    usersCollection = db.collection("users");
+    postsCollection = db.collection("posts"); // Initialize postsCollection
   } catch (err) {
     console.error("Error connecting to MongoDB:", err);
   }
@@ -213,6 +204,19 @@ const verifyAuth = async (req, res, next) => {
 };
 //Protected Routes
 
+apiRouter.get("/posts", async (req, res) => {
+  try {
+    const posts = await postsCollection.find().sort({ _id: -1 }).toArray(); // Fetch all posts, newest first
+    res.json(posts);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ message: "Failed to fetch posts" });
+  }
+});
+
+// Use the upload handler
+// app.use("/api/upload", uploadHandler(wss, postsCollection)); // Pass wss and postsCollection
+
 // Landing Page Route (Example)
 apiRouter.get("/landingPage", verifyAuth, (req, res) => {
   // Your landing page logic here
@@ -245,7 +249,7 @@ const server = app.listen(port, () => {
 const wss = new WebSocketServer({ server });
 
 // Use the upload handler
-app.use("/api/upload", uploadHandler(wss));
+app.use("/api/upload", uploadHandler(wss, postsCollection));
 
 // Pass wss to the uploadHandler module
 

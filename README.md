@@ -149,18 +149,18 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **User registration** - I did not complete this part of the deliverable.
-- [ ] **User login and logout** - I did not complete this part of the deliverable.
-- [ ] **Stores data in MongoDB** - I did not complete this part of the deliverable.
-- [ ] **Stores credentials in MongoDB** - I did not complete this part of the deliverable.
-- [ ] **Restricts functionality based on authentication** - I did not complete this part of the deliverable.
+- [x] **User registration** - I did complete this part of the deliverable.
+- [x] **User login and logout** - I did complete this part of the deliverable.
+- [x] **Stores data in MongoDB** - I did complete this part of the deliverable.
+- [x] **Stores credentials in MongoDB** - I did complete this part of the deliverable.
+- [x] **Restricts functionality based on authentication** - I did complete this part of the deliverable.
 
 ## 🚀 WebSocket deliverable
 
 For this deliverable I did the following. I checked the box `[x]` and added a description for things I completed.
 
-- [ ] **Backend listens for WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **Frontend makes WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **Data sent over WebSocket connection** - I did not complete this part of the deliverable.
-- [ ] **WebSocket data displayed** - I did not complete this part of the deliverable.
-- [ ] **Application is fully functional** - I did not complete this part of the deliverable.
+- [x] **Backend listens for WebSocket connection** - I did complete this part of the deliverable.
+- [x] **Frontend makes WebSocket connection** - I did complete this part of the deliverable.
+- [x] **Data sent over WebSocket connection** - I did complete this part of the deliverable.
+- [x] **WebSocket data displayed** - I did complete this part of the deliverable.
+- [x] **Application is fully functional** - I did complete this part of the deliverable.

@@ -55,4 +55,42 @@ For Later: add a button where once a user logs in they can add photos on the web
 
 I am currently adding functionality so that when a user posts their pictures, websocket can take it and display them on landingPage.jsx. May take some time, but I am currently configuring index.js, uploadHandler.js, and landingPage.jsx. I have made changes in the vite.config.js and package.json files to accept WebSocket, and have downloaded packages from npm into my project so I have access to it.
 
-Currently working on how to get a user to upload their photos and display them on the landingPage.jsx file. Check Gemini's latest response and paste that into your project!!
+Check out this recent error:
+
+uploadPhoto.jsx:35 Upload failed:
+AxiosError {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}
+code
+:
+"ERR_BAD_RESPONSE"
+config
+:
+{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 0, …}
+message
+:
+"Request failed with status code 500"
+name
+:
+"AxiosError"
+request
+:
+XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 0, withCredentials: false, upload: XMLHttpRequestUpload, …}
+response
+:
+{data: {…}, status: 500, statusText: 'Internal Server Error', headers: AxiosHeaders, config: {…}, …}
+status
+:
+500
+stack
+:
+"AxiosError: Request failed with status code 500\n at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=04074853:1218:12)\n at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=04074853:1550:7)\n at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=04074853:2108:41)\n at async handleSubmit (http://localhost:5173/src/uploadPhoto/uploadPhoto.jsx:21:24)"
+[[Prototype]]
+:
+Error
+
+uploadPhoto.jsx:27
+POST http://localhost:5173/api/upload 500 (Internal Server Error)
+uploadPhoto.jsx:35 Upload failed:
+AxiosError {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}
+handleSubmit @ uploadPhoto.jsx:35
+
+Check out axios error. we defined it in landingPage.jsx and could be causing errors. image seemed to be uploading in s3 storage cloud just fine. Maybe login to s3 to see if there are images there.

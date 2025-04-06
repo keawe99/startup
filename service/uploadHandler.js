@@ -1,11 +1,11 @@
 const express = require("express");
 const multer = require("multer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
-const { MongoClient } = require("mongodb");
 const fs = require("fs");
+const { WebSocket } = require("ws"); // Import WebSocket class (optional, see note)
 
-const uploadHandler = (wss) => {
-  // Accept wss as a parameter
+const uploadHandler = (wss, postsCollection) => {
+  // Accept wss and postsCollection as parameters
   const router = express.Router();
   const upload = multer({ storage: multer.memoryStorage() });
 
@@ -21,23 +21,6 @@ const uploadHandler = (wss) => {
     },
   });
 
-  //console.log("MONGODB_URI from dbConfig.json:", config.MONGODB_URI);
-  const url = config.MONGODB_URI;
-  const client = new MongoClient(url);
-  let postsCollection;
-
-  async function connectToDatabase() {
-    try {
-      await client.connect();
-      const db = client.db(config.MONGODB_DB_NAME);
-      postsCollection = db.collection("posts");
-    } catch (err) {
-      console.error("Error connecting to MongoDB:", err);
-    }
-  }
-
-  connectToDatabase();
-
   router.post("/", upload.single("image"), async (req, res) => {
     try {
       const params = {
@@ -48,7 +31,7 @@ const uploadHandler = (wss) => {
       };
 
       const command = new PutObjectCommand(params);
-      const s3UploadResult = await s3Client.send(command);
+      await s3Client.send(command);
 
       const postData = {
         imageUrl: `https://${config.S3_BUCKET_NAME}.s3.${config.AWS_REGION}.amazonaws.com/${params.Key}`,
@@ -56,7 +39,7 @@ const uploadHandler = (wss) => {
         userId: req.body.userId,
       };
 
-      await postsCollection.insertOne(postData);
+      await postsCollection.insertOne(postData); // Use the passed postsCollection
 
       // Send WebSocket message to all clients
       if (wss) {

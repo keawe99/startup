@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { useNavigate } from "react-router-dom";
 
-const UploadPage = () => {
+const UploadPage = ({ username, userId }) => {
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState("");
-  const navigate = useNavigate(); // Get the navigate function
+  const navigate = useNavigate();
 
   const handleImageChange = (event) => {
     setImage(event.target.files[0]);
@@ -20,7 +20,7 @@ const UploadPage = () => {
     const formData = new FormData();
     formData.append("image", image);
     formData.append("description", description);
-    formData.append("userId", "user123"); // Replace with actual user ID
+    formData.append("userId", userId); // Send userId
 
     try {
       const response = await axios.post("/api/upload", formData, {
@@ -28,13 +28,9 @@ const UploadPage = () => {
           "Content-Type": "multipart/form-data",
         },
       });
-      // Handle success (e.g., show a message, redirect)
       console.log("Image uploaded:", response.data.imageUrl);
-
-      // Redirect to the landing page
       navigate("/landingPage");
     } catch (error) {
-      // Handle error
       console.error("Upload failed:", error);
     }
   };
