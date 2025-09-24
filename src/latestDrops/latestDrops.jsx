@@ -71,8 +71,8 @@ const LatestDrops = () => {
             <h4>Style ID: {sneaker.model_no}</h4>
             <h4>Release Date: {sneaker.release_date}</h4>
             <h4>Release Type: {sneaker.gender}</h4>
-            <h4>Lowest Retail Price: {sneaker.lowest_price}</h4>
-            <h4>Highest Retail Price {sneaker.highest_price}</h4>
+            <h4>Lowest Retail Price: ${sneaker.lowest_price} USD</h4>
+            <h4>Highest Retail Price ${sneaker.highest_price} USD</h4>
           </div>
         ))}
     </div>
