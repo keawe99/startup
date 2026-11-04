@@ -93,6 +93,9 @@ export default function App() {
                 <NavLink className="nav-link" to="/latestDrops">
                   Latest Drops
                 </NavLink>
+                <NavLink className="nav-link" to="/aboutUs">
+                  About Us
+                </NavLink>
                 <a href="/">
                   <img
                     alt="SneakPeek360 Small Logo"

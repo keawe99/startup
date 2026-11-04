@@ -11,7 +11,7 @@ const AboutUs = () => {
           alt="backarrow"
           src="/backarrow.png" // Path relative to the public directory
           className="arrow-image"
-          style={"width: 20px height: 20px;"}
+          style={{ width: "20px", height: "20px" }}
         />
       </Link>
       <center>
@@ -19,7 +19,11 @@ const AboutUs = () => {
         <br />
         <br />
         <br />
-        <img alt="Steve" src="/Steve.jpg" />{" "}
+        <img
+          alt="Steve"
+          src="/Steve.jpg"
+          style={{ width: "700px", height: "500px" }}
+        />{" "}
         {/* Path relative to the public directory */}
         <br />
         <br />
