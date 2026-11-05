@@ -185,3 +185,44 @@ footer {
 .heading {
   text-align: right;
 }
+
+
+/* Latest Drops */
+.latest-drops-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.latest-drops-container > h2,
+.latest-drops-container > .search-bar,
+.latest-drops-container > br,
+.latest-drops-container > .loading,
+.latest-drops-container > .error {
+  grid-column: 1 / -1;
+}
+
+.sneaker-card {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.sneaker-image {
+  width: 100%;
+  max-width: 220px;
+  height: auto;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.sneaker-name {
+  font-size: 1.1rem;
+}
+
+.sneaker-card h4 {
+  font-size: 0.9rem;
+  margin: 4px 0;
+}
