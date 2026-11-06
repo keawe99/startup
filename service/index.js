@@ -7,7 +7,7 @@ const cors = require("cors");
 const uploadHandler = require("./uploadHandler");
 const path = require("path");
 const fs = require("fs");
-const { WebSocketServer } = require("ws"); // Import WebSocketServer
+const { WebSocketServer, WebSocket } = require("ws"); // WebSocket is needed for WebSocket.OPEN below
 
 const app = express();
 const port = process.argv.length > 2 ? process.argv[2] : 4000;
@@ -249,7 +249,9 @@ const server = app.listen(port, () => {
 const wss = new WebSocketServer({ server });
 
 // Use the upload handler
-app.use("/api/upload", uploadHandler(wss, postsCollection));
+// Pass a getter, not the collection itself: postsCollection is still undefined
+// here because the Mongo connection finishes after startup.
+app.use("/api/upload", uploadHandler(wss, () => postsCollection));
 
 // Pass wss to the uploadHandler module
 

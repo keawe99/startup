@@ -4,8 +4,9 @@ const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const fs = require("fs");
 const { WebSocket } = require("ws"); // Import WebSocket class (optional, see note)
 
-const uploadHandler = (wss, postsCollection) => {
-  // Accept wss and postsCollection as parameters
+const uploadHandler = (wss, getPostsCollection) => {
+  // getPostsCollection is a function so we read the collection at request time,
+  // after the MongoDB connection has finished.
   const router = express.Router();
   const upload = multer({ storage: multer.memoryStorage() });
 
@@ -23,6 +24,14 @@ const uploadHandler = (wss, postsCollection) => {
 
   router.post("/", upload.single("image"), async (req, res) => {
     try {
+      const postsCollection = getPostsCollection();
+      if (!postsCollection) {
+        return res.status(503).json({ error: "Database not ready, try again" });
+      }
+      if (!req.file) {
+        return res.status(400).json({ error: "No image file uploaded" });
+      }
+
       const params = {
         Bucket: config.S3_BUCKET_NAME,
         Key: `${Date.now()}-${req.file.originalname}`,

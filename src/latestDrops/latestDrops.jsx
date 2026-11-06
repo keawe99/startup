@@ -9,7 +9,7 @@ const formatReleaseDate = (value) => {
   const date = new Date(
     Number(str.slice(0, 4)),
     Number(str.slice(4, 6)) - 1,
-    Number(str.slice(6, 8))
+    Number(str.slice(6, 8)),
   );
   return date.toLocaleDateString("en-US", {
     year: "numeric",
@@ -22,8 +22,8 @@ const LatestDrops = () => {
   const [searchResults, setSearchResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [inputValue, setInputValue] = useState("yeezy"); // what the user types
-  const [searchTerm, setSearchTerm] = useState("yeezy"); // what we actually search
+  const [inputValue, setInputValue] = useState(""); // what the user types
+  const [searchTerm, setSearchTerm] = useState(""); // what we actually search
 
   // Wait 1 second after the user stops typing before updating searchTerm
   useEffect(() => {
@@ -47,7 +47,7 @@ const LatestDrops = () => {
         const encodedSearchTerm = encodeURIComponent(searchTerm);
 
         const response = await axios.get(
-          `http://localhost:4001/api/sneakers?searchTerm=${encodedSearchTerm}`
+          `http://localhost:4001/api/sneakers?searchTerm=${encodedSearchTerm}`,
         );
 
         console.log("Backend API Response:", response.data);
@@ -56,8 +56,7 @@ const LatestDrops = () => {
           // Corrected access here
           // Newest releases first; items with no release date go last
           const sorted = [...response.data].sort(
-            (a, b) =>
-              (b.release_date_unix || 0) - (a.release_date_unix || 0)
+            (a, b) => (b.release_date_unix || 0) - (a.release_date_unix || 0),
           );
           setSearchResults(sorted);
         } else {
