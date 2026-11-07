@@ -109,19 +109,21 @@ apiRouter.post("/auth/username", async (req, res) => {
     // Hash the password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Update the user's username and password in the database
+    // Update the user's username and password in the database.
+    // The SAME token must be stored in the database and sent in the cookie,
+    // otherwise verifyAuth can never match this session.
+    const token = uuid.v4();
     const updateResult = await usersCollection.updateOne(
       { email: email },
-      { $set: { username: username, password: passwordHash, token: uuid.v4() } } // Update password and token
+      { $set: { username: username, password: passwordHash, token } }
     );
 
     if (updateResult.modifiedCount === 1) {
-      // Set the cookie here
-      res.cookie(authCookieName, uuid.v4(), {
+      // Set the cookie here (no hard-coded domain, so it also works when deployed)
+      res.cookie(authCookieName, token, {
         httpOnly: true,
         secure: true,
         sameSite: "Lax",
-        domain: "localhost",
         path: "/",
       });
       res
@@ -192,7 +194,9 @@ apiRouter.delete("/auth/logout", async (req, res) => {
 const verifyAuth = async (req, res, next) => {
   try {
     const token = req.cookies[authCookieName];
-    if (token && (await usersCollection.findOne({ token }))) {
+    const user = token ? await usersCollection.findOne({ token }) : null;
+    if (user) {
+      req.user = user; // downstream routes can now tell who is making the request
       next();
     } else {
       res.status(401).send({ msg: "Unauthorized" });
@@ -202,9 +206,15 @@ const verifyAuth = async (req, res, next) => {
     res.status(500).send({ msg: "Internal server error" });
   }
 };
+
+// Who am I? The client uses this to know if it is really logged in.
+apiRouter.get("/auth/me", verifyAuth, (req, res) => {
+  res.send({ username: req.user.username, email: req.user.email });
+});
+
 //Protected Routes
 
-apiRouter.get("/posts", async (req, res) => {
+apiRouter.get("/posts", verifyAuth, async (req, res) => {
   try {
     const posts = await postsCollection.find().sort({ _id: -1 }).toArray(); // Fetch all posts, newest first
     res.json(posts);
@@ -251,7 +261,7 @@ const wss = new WebSocketServer({ server });
 // Use the upload handler
 // Pass a getter, not the collection itself: postsCollection is still undefined
 // here because the Mongo connection finishes after startup.
-app.use("/api/upload", uploadHandler(wss, () => postsCollection));
+app.use("/api/upload", verifyAuth, uploadHandler(wss, () => postsCollection));
 
 // Pass wss to the uploadHandler module
 

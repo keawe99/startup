@@ -4,14 +4,11 @@ import { logoutUser } from "../loginPage/loginService";
 import "../styles.css";
 import axios from "axios";
 
-const LandingPage = ({ username, setUsername }) => {
+const LandingPage = ({ username, setUsername, onLogout }) => {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
-  const socket = new WebSocket("ws://localhost:4000/ws");
 
   useEffect(() => {
-    console.log("Username prop in LandingPage:", username);
-
     const fetchPosts = async () => {
       try {
         const response = await axios.get("/api/posts");
@@ -23,6 +20,11 @@ const LandingPage = ({ username, setUsername }) => {
 
     fetchPosts();
 
+    // Created inside the effect so there is exactly one connection per mount
+    // (a socket in the component body opened a new one on every render).
+    const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const socket = new WebSocket(`${protocol}://${window.location.host}/ws`);
+
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if (message.type === "newPost") {
@@ -33,12 +35,13 @@ const LandingPage = ({ username, setUsername }) => {
     return () => {
       socket.close();
     };
-  }, [username]);
+  }, []);
 
   const handleLogout = async () => {
     try {
       await logoutUser();
       setUsername(null);
+      if (onLogout) onLogout();
       navigate("/");
     } catch (err) {
       console.error("Logout error:", err);
@@ -49,7 +52,7 @@ const LandingPage = ({ username, setUsername }) => {
     <div className="landing-page-container">
       <div className="feed-container">
         {posts.map((post) => (
-          <div key={post.imageUrl} className="post">
+          <div key={post._id || post.imageUrl} className="post">
             <div className="post-header">
               {/* Replace with actual user profile image if available */}
               <img
@@ -57,8 +60,7 @@ const LandingPage = ({ username, setUsername }) => {
                 src="https://images.wsj.net/im-322538/?width=700&height=467"
                 className="profile-pic"
               />
-              {/* Replace with actual username associated with the post */}
-              <div className="username">User ID: {post.userId}</div>
+              <div className="username">{post.username || "Unknown user"}</div>
             </div>
             <img
               alt="Uploaded Image"
@@ -66,8 +68,6 @@ const LandingPage = ({ username, setUsername }) => {
               className="post-image"
             />
             <div className="post-content">
-              {/* Replace with actual username */}
-              <div className="username">User ID: {post.userId}</div>
               <p>{post.description}</p>
               <a href="#" className="view-comments">
                 View Comments

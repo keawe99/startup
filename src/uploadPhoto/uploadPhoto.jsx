@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const UploadPage = ({ username, userId }) => {
+const UploadPage = () => {
   const [image, setImage] = useState(null);
   const [description, setDescription] = useState("");
   const navigate = useNavigate();
@@ -20,7 +20,6 @@ const UploadPage = ({ username, userId }) => {
     const formData = new FormData();
     formData.append("image", image);
     formData.append("description", description);
-    formData.append("userId", userId); // Send userId
 
     try {
       const response = await axios.post("/api/upload", formData, {

@@ -45,7 +45,10 @@ const uploadHandler = (wss, getPostsCollection) => {
       const postData = {
         imageUrl: `https://${config.S3_BUCKET_NAME}.s3.${config.AWS_REGION}.amazonaws.com/${params.Key}`,
         description: req.body.description,
-        userId: req.body.userId,
+        // Identity comes from the verified login (req.user), never from the browser
+        userId: String(req.user._id),
+        username: req.user.username,
+        createdAt: new Date(),
       };
 
       await postsCollection.insertOne(postData); // Use the passed postsCollection

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles.css";
-import Cookies from "js-cookie";
 
 const Username = ({ setUsername, onUsernameSet }) => {
   const navigate = useNavigate();
@@ -24,7 +23,6 @@ const Username = ({ setUsername, onUsernameSet }) => {
 
       if (response.ok) {
         setUsername(username);
-        console.log("Username created, cookie set:", Cookies.get("token"));
         onUsernameSet(); // Trigger re-render in App.jsx
         navigate("/landingPage");
       } else {

@@ -10,7 +10,6 @@ import LatestDrops from "./latestDrops/latestDrops.jsx";
 import Username from "./username/username.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
 import ProtectedRoute from "./protectedRoute/protectedRoute.jsx";
-import Cookies from "js-cookie"; // Import js-cookie
 
 const Home = () => {
   return (
@@ -57,24 +56,52 @@ const Home = () => {
 export default function App() {
   const [username, setUsername] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [renderKey, setRenderKey] = useState(0); // Add renderKey state
+  const [renderKey, setRenderKey] = useState(0);
+  const [authChecked, setAuthChecked] = useState(false);
 
+  // Ask the server who we are. The login cookie is httpOnly, so JavaScript
+  // cannot read it; /api/auth/me is the reliable way to know if we are logged in.
   useEffect(() => {
-    const token = Cookies.get("token");
-    if (token) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, [renderKey]); // Add renderKey to dependency array
+    let cancelled = false;
+    fetch("/api/auth/me")
+      .then(async (res) => {
+        if (cancelled) return;
+        if (res.ok) {
+          const data = await res.json();
+          setIsAuthenticated(true);
+          setUsername(data.username || "");
+        } else {
+          setIsAuthenticated(false);
+          setUsername("");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setIsAuthenticated(false);
+      })
+      .finally(() => {
+        if (!cancelled) setAuthChecked(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [renderKey]);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
 
-  const handleUsernameSet = () => {
-    setRenderKey((prevKey) => prevKey + 1); // Force re-render
+  const handleLogout = () => {
+    setIsAuthenticated(false);
   };
+
+  const handleUsernameSet = () => {
+    // The server just set the login cookie, so we are logged in now.
+    setIsAuthenticated(true);
+    setRenderKey((prevKey) => prevKey + 1); // re-check with the server
+  };
+
+  // Don't decide who may see protected pages until the server has answered
+  if (!authChecked) return null;
 
   return (
     <BrowserRouter>
@@ -130,6 +157,7 @@ export default function App() {
                   element={LandingPage}
                   username={username}
                   setUsername={setUsername}
+                  onLogout={handleLogout}
                 />
               }
             />
