@@ -450,6 +450,147 @@ button:not(.btn, .like-button, .btn-close, .nav-logout):disabled {
   margin-right: 0;
 }
 
+/* Sign up, login and username pages share one centered card layout */
+.auth-page {
+  max-width: 460px;
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+.auth-logo {
+  display: block;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  margin: 0 auto 12px;
+}
+
+.auth-title {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.auth-card {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.auth-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.auth-card .field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 16px;
+  padding: 0;
+  border: none;
+  min-width: 0; /* lets grid columns shrink instead of overflowing */
+}
+
+.auth-card .field label,
+.auth-card legend {
+  float: none;
+  width: auto;
+  padding: 0;
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.auth-card input:not([type="checkbox"]) {
+  width: 100%;
+  padding: 10px 12px;
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  color-scheme: dark; /* light calendar icon on the dark date field */
+}
+
+.auth-card input:not([type="checkbox"]):focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(225, 6, 0, 0.25);
+}
+
+/* Shoe preferences: pill toggles instead of bare checkboxes */
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.auth-card .field label.chip {
+  position: relative;
+  margin: 0;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip span {
+  display: inline-block;
+  padding: 8px 14px;
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.chip:hover span {
+  border-color: var(--accent);
+}
+
+.chip input:checked + span {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.chip input:focus-visible + span {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+}
+
+.auth-card .form-error {
+  margin: 0 0 12px;
+  text-align: left;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.auth-footer a {
+  color: var(--accent-text);
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
 /* Never let embeds or form fields push the page wider than the screen */
 iframe,
 input,

@@ -2,149 +2,148 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles.css";
 
+// name = the field the server stores, label = what the user sees
+const BRANDS = [
+  { name: "nike", label: "Nike" },
+  { name: "adidas", label: "Adidas" },
+  { name: "nb", label: "New Balance" },
+  { name: "yeezy", label: "Yeezy" },
+  { name: "puma", label: "Puma" },
+];
+
 const SignUp = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Form data submitted:", formData); // Log the form data
+    setError(null);
+    setSubmitting(true);
     try {
       const response = await fetch("/api/auth/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-      console.log("Signup response:", response); // Log the response
+      const data = await response.json().catch(() => ({}));
       if (response.ok) {
-        const data = await response.json();
-        console.log("Signup successful, navigating to /username");
         navigate("/username", { state: { email: data.email } });
+      } else if (response.status === 409) {
+        setError("An account with that email already exists.");
       } else {
-        const errorData = await response.json();
-        setError(errorData.msg || "Signup failed");
+        setError(data.msg || "Sign up failed, try again.");
       }
-    } catch (err) {
-      setError("Network error");
+    } catch {
+      setError("Network error, check your connection and try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
   const handleChange = (event) => {
     const { type, name, value, checked } = event.target;
     const newValue = type === "checkbox" ? checked : value;
-    setFormData({ ...formData, [name]: newValue });
+    setFormData((prev) => ({ ...prev, [name]: newValue }));
   };
 
   return (
-    <div>
-      <Link to="/">
-        <img alt="backarrow" src="/backarrow.png" className="arrow-image" />
+    <div className="auth-page">
+      <Link to="/" aria-label="Back to home">
+        <img alt="" src="/backarrow.png" className="arrow-image" />
       </Link>
-      <center>
-        <img
-          alt="SneakPeek360 Logo"
-          src="/SneakPeekLogo.png"
-          style={{ width: "900px", height: "500px" }}
-        />
-      </center>
-      <br />
-      <br />
-      <h3 className="heading" style={{ textAlign: "center" }}>
-        Sign Up
-      </h3>
-      <center>
-        <form
-          className="styled-form-sign-up"
-          style={{ padding: "20px" }}
-          onSubmit={handleSubmit} // Add onSubmit handler
-        >
-          <label htmlFor="firstName">First Name</label>
-          <input
-            type="text"
-            id="firstName"
-            name="firstName"
-            onChange={handleChange} // Add onChange handler
-          />
-          <br /> <br />
-          <label htmlFor="lastName">Last Name</label>
-          <input
-            type="text"
-            id="lastName"
-            name="lastName"
-            onChange={handleChange} // Add onChange handler
-          />
-          <br /> <br />
+      <img alt="SneakPeek360 Logo" src="/SneakPeekLogo.png" className="auth-logo" />
+      <h2 className="auth-title">Create your account</h2>
+
+      <form className="auth-card" onSubmit={handleSubmit}>
+        <div className="auth-row">
+          <div className="field">
+            <label htmlFor="firstName">First name</label>
+            <input
+              type="text"
+              id="firstName"
+              name="firstName"
+              autoComplete="given-name"
+              required
+              onChange={handleChange}
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="lastName">Last name</label>
+            <input
+              type="text"
+              id="lastName"
+              name="lastName"
+              autoComplete="family-name"
+              required
+              onChange={handleChange}
+            />
+          </div>
+        </div>
+
+        <div className="field">
           <label htmlFor="email">Email</label>
           <input
             type="email"
             id="email"
             name="email"
-            onChange={handleChange} // Add onChange handler
+            autoComplete="email"
+            required
+            onChange={handleChange}
           />
-          <br /> <br />
+        </div>
+
+        <div className="field">
           <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
             name="password"
-            onChange={handleChange} // Add onChange handler
+            autoComplete="new-password"
+            required
+            onChange={handleChange}
           />
-          <br /> <br />
-          <label htmlFor="birthday">Date of Birth</label>
+        </div>
+
+        <div className="field">
+          <label htmlFor="birthday">Date of birth</label>
           <input
             type="date"
             id="birthday"
             name="birthday"
-            onChange={handleChange} // Add onChange handler
+            autoComplete="bday"
+            required
+            onChange={handleChange}
           />
-          <br /> <br />
-          <label htmlFor="shoes">Shoe Preference</label> <br /> <br />
-          <label htmlFor="nike">Nike</label>
-          <input
-            type="checkbox"
-            id="nike"
-            name="nike"
-            onChange={handleChange} // Add onChange handler
-          />
-          <br /> <br />
-          <label htmlFor="adidas">Adidas</label>
-          <input
-            type="checkbox"
-            id="adidas"
-            name="adidas"
-            onChange={handleChange} // Add onChange handler
-          />
-          <br /> <br />
-          <label htmlFor="nb">New Balance</label>
-          <input
-            type="checkbox"
-            id="nb"
-            name="nb"
-            onChange={handleChange} // Add onChange handler
-          />
-          <br /> <br />
-          <label htmlFor="yeezy">Yeezy</label>
-          <input
-            type="checkbox"
-            id="yeezy"
-            name="yeezy"
-            onChange={handleChange} // Add onChange handler
-          />
-          <br /> <br />
-          <label htmlFor="puma">Puma</label>
-          <input
-            type="checkbox"
-            id="puma"
-            name="puma"
-            onChange={handleChange} // Add onChange handler
-          />
-          <br /> <br />
-          <button style={{ position: "right" }} type="submit">
-            Submit
-          </button>
-        </form>
-      </center>
+        </div>
+
+        <fieldset className="field">
+          <legend>Shoe preferences</legend>
+          <div className="chip-group">
+            {BRANDS.map(({ name, label }) => (
+              <label key={name} className="chip">
+                <input type="checkbox" name={name} onChange={handleChange} />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        {error && (
+          <p className="form-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <button type="submit" className="auth-submit" disabled={submitting}>
+          {submitting ? "Creating account..." : "Continue"}
+        </button>
+      </form>
+
+      <p className="auth-footer">
+        Already have an account? <Link to="/loginPage">Log in</Link>
+      </p>
     </div>
   );
 };
