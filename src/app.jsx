@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles.css";
-import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter,
+  NavLink,
+  Route,
+  Routes,
+  useNavigate,
+} from "react-router-dom";
+import { logoutUser } from "./loginPage/loginService";
 import LoginPage from "./loginPage/loginPage.jsx";
 import AboutUs from "./aboutUs/aboutUs.jsx";
 import SignUp from "./signUp/signUp.jsx";
@@ -10,6 +17,7 @@ import LatestDrops from "./latestDrops/latestDrops.jsx";
 import Username from "./username/username.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
 import ProfilePage from "./profilePage/profilePage.jsx";
+import BottomNav from "./bottomNav/bottomNav.jsx";
 import ProtectedRoute from "./protectedRoute/protectedRoute.jsx";
 
 const Home = () => {
@@ -51,6 +59,28 @@ const Home = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+// Lives inside <BrowserRouter> (rendered below) so it can use useNavigate
+const LogoutButton = ({ onLogout, setUsername }) => {
+  const navigate = useNavigate();
+
+  const handleClick = async () => {
+    try {
+      await logoutUser();
+      setUsername("");
+      onLogout();
+      navigate("/");
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
+
+  return (
+    <button type="button" className="nav-logout" onClick={handleClick}>
+      Logout
+    </button>
   );
 };
 
@@ -109,24 +139,55 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <div className="background">
+      <div className={`background${isAuthenticated ? " has-bottom-nav" : ""}`}>
         <div className="container">
           <div className="row">
             <div className="col-md-12">
               <div className="header-links justify-content-end">
-                <NavLink className="nav-link" to="/loginPage">
-                  Login
-                </NavLink>
-                <NavLink className="nav-link" to="/signUp">
-                  Sign Up
-                </NavLink>
+                {isAuthenticated ? (
+                  <>
+                    {/* On phones the bottom tab bar replaces these links */}
+                    <NavLink className="nav-link hide-mobile" to="/landingPage">
+                      Feed
+                    </NavLink>
+                    <NavLink className="nav-link hide-mobile" to="/uploadPhoto">
+                      Upload
+                    </NavLink>
+                    {username && (
+                      <NavLink
+                        className="nav-link hide-mobile"
+                        to={`/profile/${encodeURIComponent(username)}`}
+                      >
+                        Profile
+                      </NavLink>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <NavLink className="nav-link" to="/loginPage">
+                      Login
+                    </NavLink>
+                    <NavLink className="nav-link" to="/signUp">
+                      Sign Up
+                    </NavLink>
+                  </>
+                )}
                 <a href="https://github.com/keawe99/startup">My Github</a>
-                <NavLink className="nav-link" to="/latestDrops">
+                <NavLink
+                  className={`nav-link${isAuthenticated ? " hide-mobile" : ""}`}
+                  to="/latestDrops"
+                >
                   Latest Drops
                 </NavLink>
                 <NavLink className="nav-link" to="/aboutUs">
                   About Us
                 </NavLink>
+                {isAuthenticated && (
+                  <LogoutButton
+                    onLogout={handleLogout}
+                    setUsername={setUsername}
+                  />
+                )}
                 <a href="/">
                   <img
                     alt="SneakPeek360 Small Logo"
@@ -159,11 +220,6 @@ export default function App() {
                 <ProtectedRoute
                   isAuthenticated={isAuthenticated}
                   element={LandingPage}
-                  username={username}
-                  setUsername={setUsername}
-                  onLogout={handleLogout}
-                  profilePicUrl={profilePicUrl}
-                  setProfilePicUrl={setProfilePicUrl}
                 />
               }
             />
@@ -173,6 +229,8 @@ export default function App() {
                 <ProtectedRoute
                   isAuthenticated={isAuthenticated}
                   element={ProfilePage}
+                  currentUsername={username}
+                  setProfilePicUrl={setProfilePicUrl}
                 />
               }
             />
@@ -205,6 +263,7 @@ export default function App() {
             />
           </Routes>
         </div>
+        {isAuthenticated && <BottomNav username={username} />}
       </div>
     </BrowserRouter>
   );

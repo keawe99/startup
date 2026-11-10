@@ -120,6 +120,23 @@ li {
   border-color: var(--accent);
 }
 
+/* Logout is a real <button> but looks like the other nav tiles */
+.header-links .nav-logout {
+  padding: 10px 18px;
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.header-links .nav-logout:hover {
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
 /* The logo link is not a button-style tile */
 .header-links a:has(img),
 .header-links a:has(img):hover {
@@ -167,7 +184,6 @@ footer {
   max-width: 640px; /* keeps photos from blowing up to full width */
   margin: 0 auto;
   overflow-y: auto; /* Add scrolling if content overflows */
-  padding-right: 20px; /* Space between feed and user info */
 }
 
 .post {
@@ -229,29 +245,6 @@ footer {
 .view-comments:hover {
   color: var(--text);
 }
-
-.user-info-column {
-  width: 260px; /* Fixed width for user info */
-  padding: 20px;
-  border-left: 1px solid var(--border); /* Separator line */
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.user-info-column a {
-  display: block;
-}
-
-.user-info-column button {
-  width: 100%;
-}
-
-.heading {
-  text-align: center;
-  margin: 0 0 6px;
-}
-
 
 /* Latest Drops */
 .latest-drops-container {
@@ -337,19 +330,6 @@ footer {
   font-weight: bold;
 }
 
-.my-profile {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.my-profile .profile-pic {
-  margin-right: 0;
-}
-
 .form-error {
   color: var(--accent-text);
   font-size: 0.9rem;
@@ -357,7 +337,7 @@ footer {
 
 /* Buttons: one style for every plain <button> (Bootstrap .btn and the
    like button keep their own styling) */
-button:not(.btn):not(.like-button):not(.btn-close) {
+button:not(.btn, .like-button, .btn-close, .nav-logout) {
   background-color: var(--accent);
   color: #fff;
   border: none;
@@ -369,11 +349,11 @@ button:not(.btn):not(.like-button):not(.btn-close) {
   transition: background-color 0.2s ease;
 }
 
-button:not(.btn):not(.like-button):not(.btn-close):hover:not(:disabled) {
+button:not(.btn, .like-button, .btn-close, .nav-logout):hover:not(:disabled) {
   background-color: var(--accent-hover);
 }
 
-button:not(.btn):not(.like-button):not(.btn-close):disabled {
+button:not(.btn, .like-button, .btn-close, .nav-logout):disabled {
   opacity: 0.6;
   cursor: default;
 }
@@ -393,6 +373,15 @@ button:not(.btn):not(.like-button):not(.btn-close):disabled {
 .profile-header p {
   margin: 0;
   text-align: left;
+}
+
+.profile-actions {
+  margin-top: 0.5rem;
+}
+
+.profile-actions .form-error {
+  text-align: left;
+  margin: 0.4rem 0 0;
 }
 
 .profile-grid {
@@ -421,6 +410,12 @@ textarea {
   max-width: 100%;
 }
 
+/* The tab bar is a phone pattern; desktop keeps the top nav. This default
+   must come BEFORE the media query so the phone rule can override it. */
+.bottom-nav {
+  display: none;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
   .container {
@@ -440,7 +435,8 @@ textarea {
   }
 
   .header-links a,
-  .header-links .nav-link {
+  .header-links .nav-link,
+  .header-links .nav-logout {
     padding: 8px 12px;
     font-size: 0.9rem;
   }
@@ -455,39 +451,13 @@ textarea {
     aspect-ratio: 16 / 9;
   }
 
-  /* Landing page: profile card on top, feed below, no side column */
   .landing-page-container {
-    flex-direction: column;
     min-height: auto;
     padding: 12px;
   }
 
-  .user-info-column {
-    order: -1;
-    width: 100%;
-    padding: 0 0 12px;
-    margin-bottom: 12px;
-    border-left: none;
-    border-bottom: 1px solid var(--border);
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .user-info-column button {
-    width: auto;
-  }
-
-  .my-profile,
-  .heading {
-    width: 100%;
-    margin-bottom: 0;
-  }
-
   .feed-container {
     max-width: 100%;
-    padding-right: 0;
   }
 
   .post-image {
@@ -506,7 +476,7 @@ textarea {
   }
 
   /* Comfortable touch targets; 16px inputs stop iOS from zooming on focus */
-  button:not(.btn):not(.like-button):not(.btn-close) {
+  button:not(.btn, .like-button, .btn-close, .nav-logout) {
     min-height: 44px;
   }
 
@@ -514,5 +484,54 @@ textarea {
   select,
   textarea {
     font-size: 16px;
+  }
+
+  /* Top-nav links that the bottom tab bar replaces */
+  .header-links .hide-mobile {
+    display: none !important;
+  }
+
+  /* Bottom tab bar (logged-in users only; not rendered otherwise) */
+  .bottom-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    background-color: var(--surface);
+    border-top: 1px solid var(--border);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    min-height: 56px;
+    color: var(--muted);
+    font-size: 0.7rem;
+  }
+
+  .bottom-nav-item svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--accent-text);
+  }
+
+  /* Keep the last post from hiding behind the tab bar */
+  .background.has-bottom-nav {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom));
   }
 }

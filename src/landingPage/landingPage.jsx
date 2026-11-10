@@ -1,10 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { logoutUser } from "../loginPage/loginService";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import "../styles.css";
 import axios from "axios";
-
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // keep in sync with the server limit
 
 // A user's picture, or a circle with their first initial if they have none
 export const Avatar = ({ url, name, size = 40 }) => {
@@ -29,19 +26,9 @@ export const Avatar = ({ url, name, size = 40 }) => {
   );
 };
 
-const LandingPage = ({
-  username,
-  setUsername,
-  onLogout,
-  profilePicUrl,
-  setProfilePicUrl,
-}) => {
-  const navigate = useNavigate();
+const LandingPage = () => {
   const [posts, setPosts] = useState([]);
   const [pendingLikes, setPendingLikes] = useState(() => new Set());
-  const [uploadingPic, setUploadingPic] = useState(false);
-  const [profileError, setProfileError] = useState("");
-  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -135,40 +122,6 @@ const LandingPage = ({
     }
   };
 
-  const handleProfilePicChange = async (event) => {
-    const file = event.target.files[0];
-    event.target.value = ""; // lets the user pick the same file again later
-    if (!file) return;
-    if (file.size > MAX_IMAGE_BYTES) {
-      setProfileError("Image must be 5 MB or smaller");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("image", file);
-    setUploadingPic(true);
-    setProfileError("");
-    try {
-      const { data } = await axios.post("/api/upload/profile-picture", formData);
-      setProfilePicUrl(data.profilePicUrl);
-    } catch (error) {
-      setProfileError(error.response?.data?.error || "Upload failed, try again");
-    } finally {
-      setUploadingPic(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logoutUser();
-      setUsername(null);
-      if (onLogout) onLogout();
-      navigate("/");
-    } catch (err) {
-      console.error("Logout error:", err);
-    }
-  };
-
   return (
     <div className="landing-page-container">
       <div className="feed-container">
@@ -214,40 +167,6 @@ const LandingPage = ({
             </div>
           </div>
         ))}
-      </div>
-      <div className="user-info-column">
-        <div className="my-profile">
-          <Avatar url={profilePicUrl} name={username} size={96} />
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp,image/gif"
-            onChange={handleProfilePicChange}
-            style={{ display: "none" }}
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={uploadingPic}
-          >
-            {uploadingPic
-              ? "Uploading..."
-              : profilePicUrl
-                ? "Change profile picture"
-                : "Add profile picture"}
-          </button>
-          {profileError && <p className="form-error">{profileError}</p>}
-        </div>
-        <h3 className="heading">Welcome {username || "User!"}!</h3>
-        <button onClick={handleLogout}>Logout</button>
-        <Link to="/uploadPhoto">
-          <button>Upload Photo</button>
-        </Link>
-        {username && (
-          <Link to={`/profile/${encodeURIComponent(username)}`}>
-            <button>My Profile</button>
-          </Link>
-        )}
       </div>
     </div>
   );

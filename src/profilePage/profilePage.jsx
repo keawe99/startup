@@ -1,18 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { Avatar } from "../landingPage/landingPage.jsx";
 import "../styles.css";
 
-const ProfilePage = () => {
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // keep in sync with the server limit
+
+// currentUsername is the logged-in user; setProfilePicUrl keeps App's copy of
+// their picture in sync after a change.
+const ProfilePage = ({ currentUsername, setProfilePicUrl }) => {
   const { username } = useParams();
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState("");
+  const [uploadingPic, setUploadingPic] = useState(false);
+  const [picError, setPicError] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     let cancelled = false;
     setProfile(null);
     setError("");
+    setPicError("");
 
     axios
       .get(`/api/users/${encodeURIComponent(username)}/posts`)
@@ -33,6 +41,30 @@ const ProfilePage = () => {
     };
   }, [username]);
 
+  const handlePicChange = async (event) => {
+    const file = event.target.files[0];
+    event.target.value = ""; // lets the user pick the same file again later
+    if (!file) return;
+    if (file.size > MAX_IMAGE_BYTES) {
+      setPicError("Image must be 5 MB or smaller");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+    setUploadingPic(true);
+    setPicError("");
+    try {
+      const { data } = await axios.post("/api/upload/profile-picture", formData);
+      setProfile((prev) => ({ ...prev, profilePicUrl: data.profilePicUrl }));
+      if (setProfilePicUrl) setProfilePicUrl(data.profilePicUrl);
+    } catch (err) {
+      setPicError(err.response?.data?.error || "Upload failed, try again");
+    } finally {
+      setUploadingPic(false);
+    }
+  };
+
   if (error) {
     return (
       <div className="container text-center">
@@ -42,6 +74,9 @@ const ProfilePage = () => {
     );
   }
   if (!profile) return null;
+
+  // Only your own profile can change its picture
+  const isMe = Boolean(currentUsername) && currentUsername === profile.username;
 
   return (
     <div className="container">
@@ -53,6 +88,29 @@ const ProfilePage = () => {
             {profile.posts.length}{" "}
             {profile.posts.length === 1 ? "photo" : "photos"}
           </p>
+          {isMe && (
+            <div className="profile-actions">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handlePicChange}
+                style={{ display: "none" }}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPic}
+              >
+                {uploadingPic
+                  ? "Uploading..."
+                  : profile.profilePicUrl
+                    ? "Change profile picture"
+                    : "Add profile picture"}
+              </button>
+              {picError && <p className="form-error">{picError}</p>}
+            </div>
+          )}
         </div>
       </div>
 
