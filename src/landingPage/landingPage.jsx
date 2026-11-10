@@ -7,7 +7,7 @@ import axios from "axios";
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // keep in sync with the server limit
 
 // A user's picture, or a circle with their first initial if they have none
-const Avatar = ({ url, name, size = 40 }) => {
+export const Avatar = ({ url, name, size = 40 }) => {
   const style = { width: size, height: size };
   if (url) {
     return (
@@ -176,7 +176,15 @@ const LandingPage = ({
           <div key={post._id} className="post">
             <div className="post-header">
               <Avatar url={post.profilePicUrl} name={post.username} />
-              <div className="username">{post.username || "Unknown user"}</div>
+              <div className="username">
+                {post.username ? (
+                  <Link to={`/profile/${encodeURIComponent(post.username)}`}>
+                    {post.username}
+                  </Link>
+                ) : (
+                  "Unknown user"
+                )}
+              </div>
             </div>
             <img
               alt="Uploaded Image"

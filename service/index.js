@@ -248,6 +248,37 @@ apiRouter.get("/posts", verifyAuth, async (req, res) => {
   }
 });
 
+// One user's profile: their public info plus all of their posts, newest first
+apiRouter.get("/users/:username/posts", verifyAuth, async (req, res) => {
+  try {
+    const profileUser = await usersCollection.findOne(
+      { username: req.params.username },
+      { projection: { username: 1, profilePicUrl: 1 } }
+    );
+    if (!profileUser) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    const posts = await postsCollection
+      .find({ userId: String(profileUser._id) })
+      .sort({ _id: -1 })
+      .limit(100)
+      .toArray();
+
+    const viewerId = String(req.user._id);
+    res.json({
+      username: profileUser.username,
+      profilePicUrl: profileUser.profilePicUrl || null,
+      posts: posts.map((p) =>
+        toFeedPost(p, profileUser.profilePicUrl, viewerId)
+      ),
+    });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ msg: "Failed to fetch profile" });
+  }
+});
+
 // Send a message to every connected browser (wss is created further down)
 const broadcast = (message) => {
   const text = JSON.stringify(message);

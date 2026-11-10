@@ -9,6 +9,7 @@ import LandingPage from "./landingPage/landingPage.jsx";
 import LatestDrops from "./latestDrops/latestDrops.jsx";
 import Username from "./username/username.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
+import ProfilePage from "./profilePage/profilePage.jsx";
 import ProtectedRoute from "./protectedRoute/protectedRoute.jsx";
 
 const Home = () => {
@@ -163,6 +164,15 @@ export default function App() {
                   onLogout={handleLogout}
                   profilePicUrl={profilePicUrl}
                   setProfilePicUrl={setProfilePicUrl}
+                />
+              }
+            />
+            <Route
+              path="/profile/:username"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={ProfilePage}
                 />
               }
             />
