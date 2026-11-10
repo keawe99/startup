@@ -248,6 +248,43 @@ apiRouter.get("/posts", verifyAuth, async (req, res) => {
   }
 });
 
+// Find users by username: case-insensitive "contains" match, best matches
+// (usernames that START with the search) first. Returns public info only.
+apiRouter.get("/users/search", verifyAuth, async (req, res) => {
+  try {
+    const q = String(req.query.q || "").trim().slice(0, 30);
+    if (!q) return res.json([]);
+
+    // Escape regex characters so "a.b" or "(" is searched literally
+    const escaped = q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const users = await usersCollection
+      .find(
+        { username: { $regex: escaped, $options: "i" } },
+        { projection: { username: 1, profilePicUrl: 1 } }
+      )
+      .limit(50)
+      .toArray();
+
+    const lower = q.toLowerCase();
+    const startsWith = (u) => u.username.toLowerCase().startsWith(lower);
+    users.sort(
+      (a, b) =>
+        Number(startsWith(b)) - Number(startsWith(a)) ||
+        a.username.localeCompare(b.username)
+    );
+
+    res.json(
+      users.slice(0, 20).map((u) => ({
+        username: u.username,
+        profilePicUrl: u.profilePicUrl || null,
+      }))
+    );
+  } catch (error) {
+    console.error("Error searching users:", error);
+    res.status(500).json({ msg: "Search failed" });
+  }
+});
+
 // One user's profile: their public info plus all of their posts, newest first
 apiRouter.get("/users/:username/posts", verifyAuth, async (req, res) => {
   try {

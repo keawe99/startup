@@ -17,6 +17,7 @@ import LatestDrops from "./latestDrops/latestDrops.jsx";
 import Username from "./username/username.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
 import ProfilePage from "./profilePage/profilePage.jsx";
+import SearchPage from "./searchPage/searchPage.jsx";
 import BottomNav from "./bottomNav/bottomNav.jsx";
 import ProtectedRoute from "./protectedRoute/protectedRoute.jsx";
 
@@ -150,6 +151,9 @@ export default function App() {
                     <NavLink className="nav-link hide-mobile" to="/landingPage">
                       Feed
                     </NavLink>
+                    <NavLink className="nav-link hide-mobile" to="/search">
+                      Search
+                    </NavLink>
                     <NavLink className="nav-link hide-mobile" to="/uploadPhoto">
                       Upload
                     </NavLink>
@@ -231,6 +235,15 @@ export default function App() {
                   element={ProfilePage}
                   currentUsername={username}
                   setProfilePicUrl={setProfilePicUrl}
+                />
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={isAuthenticated}
+                  element={SearchPage}
                 />
               }
             />

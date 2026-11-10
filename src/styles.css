@@ -402,6 +402,54 @@ button:not(.btn, .like-button, .btn-close, .nav-logout):disabled {
   text-align: center;
 }
 
+/* User search */
+.search-page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.search-status {
+  color: var(--muted);
+  margin-top: 1rem;
+}
+
+.search-results {
+  margin: 1rem 0 0;
+}
+
+.search-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.search-result:hover {
+  border-color: var(--accent);
+}
+
+.search-result .profile-pic {
+  margin-right: 0;
+}
+
 /* Never let embeds or form fields push the page wider than the screen */
 iframe,
 input,
