@@ -2,9 +2,10 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 const uuid = require("uuid");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 const cors = require("cors");
 const uploadHandler = require("./uploadHandler");
+const { toFeedPost } = require("./feed");
 const path = require("path");
 const fs = require("fs");
 const { WebSocketServer, WebSocket } = require("ws"); // WebSocket is needed for WebSocket.OPEN below
@@ -209,18 +210,90 @@ const verifyAuth = async (req, res, next) => {
 
 // Who am I? The client uses this to know if it is really logged in.
 apiRouter.get("/auth/me", verifyAuth, (req, res) => {
-  res.send({ username: req.user.username, email: req.user.email });
+  res.send({
+    username: req.user.username,
+    email: req.user.email,
+    profilePicUrl: req.user.profilePicUrl || null,
+  });
 });
 
 //Protected Routes
 
 apiRouter.get("/posts", verifyAuth, async (req, res) => {
   try {
-    const posts = await postsCollection.find().sort({ _id: -1 }).toArray(); // Fetch all posts, newest first
-    res.json(posts);
+    const viewerId = String(req.user._id);
+    // Newest first. Capped at 100 until the feed gets pagination.
+    const posts = await postsCollection
+      .find()
+      .sort({ _id: -1 })
+      .limit(100)
+      .toArray();
+
+    // Look up each poster's CURRENT profile picture, so a changed picture
+    // shows on their older posts too.
+    const userIds = [...new Set(posts.map((p) => p.userId))]
+      .filter((id) => ObjectId.isValid(id))
+      .map((id) => new ObjectId(id));
+    const users = userIds.length
+      ? await usersCollection
+          .find({ _id: { $in: userIds } }, { projection: { profilePicUrl: 1 } })
+          .toArray()
+      : [];
+    const pictures = new Map(users.map((u) => [String(u._id), u.profilePicUrl]));
+
+    res.json(posts.map((p) => toFeedPost(p, pictures.get(p.userId), viewerId)));
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ message: "Failed to fetch posts" });
+  }
+});
+
+// Send a message to every connected browser (wss is created further down)
+const broadcast = (message) => {
+  const text = JSON.stringify(message);
+  wss.clients.forEach((client) => {
+    if (client.readyState === WebSocket.OPEN) client.send(text);
+  });
+};
+
+// Like or unlike a post (toggles for the logged-in user)
+apiRouter.post("/posts/:id/like", verifyAuth, async (req, res) => {
+  try {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ msg: "Invalid post id" });
+    }
+    const postId = new ObjectId(req.params.id);
+    const me = String(req.user._id);
+
+    // Already liked? Remove the like. Otherwise add it. $addToSet can never
+    // store the same user twice, even if two requests arrive at once.
+    const removed = await postsCollection.updateOne(
+      { _id: postId, likes: me },
+      { $pull: { likes: me } }
+    );
+    let liked = false;
+    if (removed.modifiedCount === 0) {
+      const added = await postsCollection.updateOne(
+        { _id: postId },
+        { $addToSet: { likes: me } }
+      );
+      if (added.matchedCount === 0) {
+        return res.status(404).json({ msg: "Post not found" });
+      }
+      liked = true;
+    }
+
+    const post = await postsCollection.findOne(
+      { _id: postId },
+      { projection: { likes: 1 } }
+    );
+    const likeCount = (post?.likes || []).length;
+
+    broadcast({ type: "likeUpdate", postId: String(postId), likeCount });
+    res.json({ liked, likeCount });
+  } catch (error) {
+    console.error("Error toggling like:", error);
+    res.status(500).json({ msg: "Failed to update like" });
   }
 });
 
@@ -261,24 +334,23 @@ const wss = new WebSocketServer({ server });
 // Use the upload handler
 // Pass a getter, not the collection itself: postsCollection is still undefined
 // here because the Mongo connection finishes after startup.
-app.use("/api/upload", verifyAuth, uploadHandler(wss, () => postsCollection));
+app.use(
+  "/api/upload",
+  verifyAuth,
+  uploadHandler(
+    wss,
+    () => postsCollection,
+    () => usersCollection
+  )
+);
 
 // Pass wss to the uploadHandler module
 
 wss.on("connection", (ws) => {
   console.log("Client connected via WebSocket");
 
-  ws.on("message", (message) => {
-    const data = JSON.parse(message.toString()); // Parse message as JSON
-    console.log(`Received message: ${JSON.stringify(data)}`);
-
-    // Broadcast the message to all connected clients
-    wss.clients.forEach((client) => {
-      if (client !== ws && client.readyState === WebSocket.OPEN) {
-        client.send(JSON.stringify(data)); // Send as JSON
-      }
-    });
-  });
+  // Browsers only listen. The server no longer re-broadcasts messages that
+  // clients send, because anyone could use that to fake likes or posts.
 
   ws.on("close", () => {
     console.log("Client disconnected from WebSocket");

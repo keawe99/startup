@@ -55,6 +55,7 @@ const Home = () => {
 
 export default function App() {
   const [username, setUsername] = useState("");
+  const [profilePicUrl, setProfilePicUrl] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [renderKey, setRenderKey] = useState(0);
   const [authChecked, setAuthChecked] = useState(false);
@@ -70,9 +71,11 @@ export default function App() {
           const data = await res.json();
           setIsAuthenticated(true);
           setUsername(data.username || "");
+          setProfilePicUrl(data.profilePicUrl || "");
         } else {
           setIsAuthenticated(false);
           setUsername("");
+          setProfilePicUrl("");
         }
       })
       .catch(() => {
@@ -158,6 +161,8 @@ export default function App() {
                   username={username}
                   setUsername={setUsername}
                   onLogout={handleLogout}
+                  profilePicUrl={profilePicUrl}
+                  setProfilePicUrl={setProfilePicUrl}
                 />
               }
             />

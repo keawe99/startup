@@ -226,3 +226,69 @@ footer {
   font-size: 0.9rem;
   margin: 4px 0;
 }
+
+
+/* Likes */
+.like-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.like-button {
+  background: none;
+  border: none;
+  color: #ccc;
+  font-size: 1.5rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.like-button.liked {
+  color: #ff4d6d;
+}
+
+.like-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.like-count {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* Profile pictures */
+.profile-pic {
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.profile-pic-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #555;
+  color: white;
+  font-weight: bold;
+}
+
+.my-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.my-profile .profile-pic {
+  margin-right: 0;
+}
+
+.form-error {
+  color: #ff6b6b;
+  font-size: 0.9rem;
+}
