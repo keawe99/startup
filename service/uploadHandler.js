@@ -36,7 +36,12 @@ const detectImageType = (buf) => {
   return null;
 };
 
-const uploadHandler = (wss, getPostsCollection, getUsersCollection) => {
+const uploadHandler = (
+  wss,
+  getPostsCollection,
+  getUsersCollection,
+  getFollowsCollection
+) => {
   // The get...Collection arguments are functions so we read the collections at
   // request time, after the MongoDB connection has finished.
   const router = express.Router();
@@ -63,6 +68,25 @@ const uploadHandler = (wss, getPostsCollection, getUsersCollection) => {
     const text = JSON.stringify(message);
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) client.send(text);
+    });
+  };
+
+  // Deliver a message only to the author and the people who follow them
+  // (each socket's userId is set from its login cookie in index.js)
+  const sendToAuthorAndFollowers = async (authorId, message) => {
+    if (!wss) return;
+    const follows = await getFollowsCollection()
+      .find(
+        { followeeId: authorId, status: "accepted" },
+        { projection: { followerId: 1 } }
+      )
+      .toArray();
+    const allowed = new Set([authorId, ...follows.map((f) => f.followerId)]);
+    const text = JSON.stringify(message);
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN && allowed.has(client.userId)) {
+        client.send(text);
+      }
     });
   };
 
@@ -127,10 +151,15 @@ const uploadHandler = (wss, getPostsCollection, getUsersCollection) => {
 
       await postsCollection.insertOne(postData); // adds postData._id
 
-      broadcast({
-        type: "newPost",
-        post: toFeedPost(postData, req.user.profilePicUrl, null),
-      });
+      // The post is saved; a live-update failure must not fail the upload
+      try {
+        await sendToAuthorAndFollowers(postData.userId, {
+          type: "newPost",
+          post: toFeedPost(postData, req.user.profilePicUrl, null),
+        });
+      } catch (error) {
+        console.error("Error sending live update:", error);
+      }
 
       res.json({ imageUrl: postData.imageUrl });
     } catch (error) {

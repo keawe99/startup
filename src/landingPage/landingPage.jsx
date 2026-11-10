@@ -28,6 +28,7 @@ export const Avatar = ({ url, name, size = 40 }) => {
 
 const LandingPage = () => {
   const [posts, setPosts] = useState([]);
+  const [loaded, setLoaded] = useState(false); // so "empty feed" isn't flashed while loading
   const [pendingLikes, setPendingLikes] = useState(() => new Set());
 
   useEffect(() => {
@@ -37,6 +38,8 @@ const LandingPage = () => {
         setPosts(response.data);
       } catch (error) {
         console.error("Error fetching initial posts:", error);
+      } finally {
+        setLoaded(true);
       }
     };
 
@@ -125,6 +128,15 @@ const LandingPage = () => {
   return (
     <div className="landing-page-container">
       <div className="feed-container">
+        {loaded && posts.length === 0 && (
+          <div className="empty-feed">
+            <h3>Your feed is empty</h3>
+            <p>
+              Photos from you and the people you follow show up here.{" "}
+              <Link to="/search">Find people to follow</Link>.
+            </p>
+          </div>
+        )}
         {posts.map((post) => (
           <div key={post._id} className="post">
             <div className="post-header">
