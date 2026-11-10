@@ -44,19 +44,12 @@ const ProfilePage = () => {
   if (!profile) return null;
 
   return (
-    <div className="container" style={{ color: "white" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "1rem",
-          marginBottom: "1.5rem",
-        }}
-      >
+    <div className="container">
+      <div className="profile-header">
         <Avatar url={profile.profilePicUrl} name={profile.username} size={96} />
         <div>
-          <h2 style={{ margin: 0 }}>{profile.username}</h2>
-          <p style={{ margin: 0 }}>
+          <h2>{profile.username}</h2>
+          <p>
             {profile.posts.length}{" "}
             {profile.posts.length === 1 ? "photo" : "photos"}
           </p>
@@ -66,29 +59,19 @@ const ProfilePage = () => {
       {profile.posts.length === 0 ? (
         <p>No photos yet.</p>
       ) : (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-            gap: "0.75rem",
-          }}
-        >
+        <div className="profile-grid">
           {profile.posts.map((post) => (
             <img
               key={post._id}
               src={post.imageUrl}
               alt={post.description || `Photo by ${profile.username}`}
-              style={{
-                width: "100%",
-                aspectRatio: "1 / 1",
-                objectFit: "cover",
-              }}
+              className="profile-photo"
             />
           ))}
         </div>
       )}
 
-      <p style={{ marginTop: "1.5rem" }}>
+      <p className="profile-back">
         <Link to="/landingPage">Back to feed</Link>
       </p>
     </div>

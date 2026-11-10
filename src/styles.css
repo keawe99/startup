@@ -1,8 +1,22 @@
 /* styles.css */
+/* Palette: near-black surfaces with one red accent (from the logo) */
+:root {
+  --bg: #0b0b0c;
+  --surface: #151517;
+  --surface-2: #1d1d20;
+  --border: #2c2c31;
+  --text: #f2f2f2;
+  --muted: #9a9aa2;
+  --accent: #e10600;
+  --accent-hover: #ff2a24;
+  --accent-text: #ff4d4d; /* red that stays readable on dark surfaces */
+}
+
 /* General Styles */
 body {
-  font-family: sans-serif;
-  color: white;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
 }
 
 h1 {
@@ -22,7 +36,11 @@ h5 {
 }
 
 p {
-  text-align: center;
+  font-size: 1rem;
+}
+
+/* Only the centered marketing text (home, about) gets the larger size */
+.text-center p {
   font-size: larger;
 }
 
@@ -43,9 +61,9 @@ li {
 
 /* Container and Columns (using Bootstrap classes) */
 .background {
-  background-image: url("../42.blaack-x512.jpg");
-  background-size: cover;
-  filter: contrast(80%);
+  /* Flat near-black (set on body). The old texture and contrast filter
+     washed out every photo inside this wrapper. */
+  min-height: 100vh;
 }
 
 .container {
@@ -73,24 +91,41 @@ li {
 /* Header Links */
 .header-links {
   display: flex;
+  align-items: center; /* tiles were stretching to the logo's height */
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 20px;
 }
 
 .header-links a,
 .header-links .nav-link {
   display: inline-block;
-  padding: 10px 20px;
-  margin-left: 5px;
-  background-color: gray;
-  color: white;
-  border-radius: 5px;
-  transition: background-color 0.3s ease;
-  font-size: larger;
+  padding: 10px 18px;
+  margin-left: 0;
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  font-size: 1rem;
 }
 
 .header-links a:hover,
 .header-links .nav-link:hover {
-  background-color: red;
+  background-color: var(--accent);
+  border-color: var(--accent);
+}
+
+.header-links .nav-link.active {
+  border-color: var(--accent);
+}
+
+/* The logo link is not a button-style tile */
+.header-links a:has(img),
+.header-links a:has(img):hover {
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 /* Footer Styles */
@@ -110,13 +145,6 @@ footer {
   text-align: center;
 }
 
-.col-md-4 {
-  padding: 20px;
-}
-.col-md-8 {
-  padding: 20px;
-}
-
 .arrow-image {
   height: 30px;
   width: 25px;
@@ -126,29 +154,37 @@ footer {
 .landing-page-container {
   display: flex; /* Use flexbox for layout */
   min-height: 100vh; /* Ensure full viewport height */
-  background-color: #282c34; /* Dark background color */
-  color: white; /* White text color */
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
   padding: 20px; /* Add some padding */
 }
 
 .feed-container {
   flex: 1; /* Take up available space */
+  min-width: 0;
+  max-width: 640px; /* keeps photos from blowing up to full width */
+  margin: 0 auto;
   overflow-y: auto; /* Add scrolling if content overflows */
   padding-right: 20px; /* Space between feed and user info */
 }
 
 .post {
   margin-bottom: 20px; /* Space between posts */
-  border: 1px solid #ddd; /* Light border */
-  border-radius: 8px; /* Rounded corners */
+  background-color: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
   overflow: hidden; /* Hide overflowing content */
 }
 
 .post-header {
   display: flex;
   align-items: center; /* Vertically center items */
-  padding: 10px;
-  background-color: #333; /* Slightly darker background */
+  padding: 10px 12px;
+  background-color: transparent;
+  border-bottom: 1px solid var(--border);
 }
 
 .profile-pic {
@@ -156,6 +192,8 @@ footer {
   height: 40px;
   border-radius: 50%;
   margin-right: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .username {
@@ -168,26 +206,50 @@ footer {
 
 .post-image {
   width: 100%;
+  max-height: 560px;
+  object-fit: cover;
   display: block; /* Prevent image from creating extra space */
 }
 
 .post-content {
-  padding: 10px;
+  padding: 12px;
+}
+
+.post-content p {
+  text-align: left;
+  margin-bottom: 8px;
 }
 
 .view-comments {
-  color: #007bff; /* Blue link color */
+  color: var(--muted);
   text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.view-comments:hover {
+  color: var(--text);
 }
 
 .user-info-column {
-  width: 250px; /* Fixed width for user info */
+  width: 260px; /* Fixed width for user info */
   padding: 20px;
-  border-left: 1px solid #ddd; /* Separator line */
+  border-left: 1px solid var(--border); /* Separator line */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.user-info-column a {
+  display: block;
+}
+
+.user-info-column button {
+  width: 100%;
 }
 
 .heading {
-  text-align: right;
+  text-align: center;
+  margin: 0 0 6px;
 }
 
 
@@ -208,8 +270,9 @@ footer {
 }
 
 .sneaker-card {
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   padding: 16px;
   text-align: center;
 }
@@ -251,7 +314,7 @@ footer {
 }
 
 .like-button.liked {
-  color: #ff4d6d;
+  color: var(--accent-text);
 }
 
 .like-button:disabled {
@@ -265,11 +328,6 @@ footer {
 }
 
 /* Profile pictures */
-.profile-pic {
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
 .profile-pic-fallback {
   display: flex;
   align-items: center;
@@ -293,6 +351,168 @@ footer {
 }
 
 .form-error {
-  color: #ff6b6b;
+  color: var(--accent-text);
   font-size: 0.9rem;
+}
+
+/* Buttons: one style for every plain <button> (Bootstrap .btn and the
+   like button keep their own styling) */
+button:not(.btn):not(.like-button):not(.btn-close) {
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:not(.btn):not(.like-button):not(.btn-close):hover:not(:disabled) {
+  background-color: var(--accent-hover);
+}
+
+button:not(.btn):not(.like-button):not(.btn-close):disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Profile page */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-header h2 {
+  margin: 0;
+}
+
+.profile-header p {
+  margin: 0;
+  text-align: left;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.profile-photo {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.profile-back {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+/* Never let embeds or form fields push the page wider than the screen */
+iframe,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  .col-md-4,
+  .col-md-8,
+  .col-md-12 {
+    padding: 8px;
+  }
+
+  /* Bootstrap's justify-content-end is !important, so this must be too */
+  .header-links {
+    justify-content: center !important;
+    gap: 6px;
+  }
+
+  .header-links a,
+  .header-links .nav-link {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+  }
+
+  /* The home page video has a fixed 600x400 size in its markup */
+  iframe {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Landing page: profile card on top, feed below, no side column */
+  .landing-page-container {
+    flex-direction: column;
+    min-height: auto;
+    padding: 12px;
+  }
+
+  .user-info-column {
+    order: -1;
+    width: 100%;
+    padding: 0 0 12px;
+    margin-bottom: 12px;
+    border-left: none;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .user-info-column button {
+    width: auto;
+  }
+
+  .my-profile,
+  .heading {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .feed-container {
+    max-width: 100%;
+    padding-right: 0;
+  }
+
+  .post-image {
+    max-height: 420px;
+  }
+
+  .latest-drops-container {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .profile-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 0.4rem;
+  }
+
+  /* Comfortable touch targets; 16px inputs stop iOS from zooming on focus */
+  button:not(.btn):not(.like-button):not(.btn-close) {
+    min-height: 44px;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
