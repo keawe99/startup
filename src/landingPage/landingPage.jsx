@@ -243,6 +243,11 @@ const LandingPage = ({
         <Link to="/uploadPhoto">
           <button>Upload Photo</button>
         </Link>
+        {username && (
+          <Link to={`/profile/${encodeURIComponent(username)}`}>
+            <button>My Profile</button>
+          </Link>
+        )}
       </div>
     </div>
   );
