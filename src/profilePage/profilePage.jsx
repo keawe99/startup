@@ -28,7 +28,7 @@ const FollowRequests = ({ onAnswered }) => {
     setBusy(username);
     try {
       await axios.post(
-        `/api/follow-requests/${encodeURIComponent(username)}/${action}`
+        `/api/follow-requests/${encodeURIComponent(username)}/${action}`,
       );
       setRequests((prev) => prev.filter((r) => r.username !== username));
       onAnswered(); // follower count may have changed
@@ -99,7 +99,7 @@ const FollowersList = ({ onChanged }) => {
   const remove = async (username) => {
     if (
       !window.confirm(
-        `Remove ${username} as a follower? They will stop seeing your photos.`
+        `Remove ${username} as a follower? They will stop seeing your photos.`,
       )
     ) {
       return;
@@ -178,7 +178,7 @@ const ProfilePage = ({ currentUsername, setProfilePicUrl }) => {
         setError(
           err.response?.status === 404
             ? "No user with that username."
-            : "Could not load this profile, try again."
+            : "Could not load this profile, try again.",
         );
       });
 
@@ -211,7 +211,10 @@ const ProfilePage = ({ currentUsername, setProfilePicUrl }) => {
     setUploadingPic(true);
     setPicError("");
     try {
-      const { data } = await axios.post("/api/upload/profile-picture", formData);
+      const { data } = await axios.post(
+        "/api/upload/profile-picture",
+        formData,
+      );
       setProfile((prev) => ({ ...prev, profilePicUrl: data.profilePicUrl }));
       if (setProfilePicUrl) setProfilePicUrl(data.profilePicUrl);
     } catch (err) {
@@ -228,7 +231,7 @@ const ProfilePage = ({ currentUsername, setProfilePicUrl }) => {
       relationship === "following" &&
       profile.isPrivate &&
       !window.confirm(
-        `Unfollow ${profile.username}? You won't see their photos unless they approve you again.`
+        `Unfollow ${profile.username}? You won't see their photos unless they approve you again.`,
       )
     ) {
       return;
@@ -264,14 +267,6 @@ const ProfilePage = ({ currentUsername, setProfilePicUrl }) => {
     }
   };
 
-  if (error) {
-    return (
-      <div className="container text-center">
-        <p className="form-error">{error}</p>
-        <Link to="/landingPage">Back to feed</Link>
-      </div>
-    );
-  }
   if (!profile) return null;
 
   // Only your own profile can change its picture
@@ -283,7 +278,14 @@ const ProfilePage = ({ currentUsername, setProfilePicUrl }) => {
   }[profile.relationship];
 
   return (
-    <div className="container">
+    <div className="container profile-page">
+      <Link
+        to="/landingPage"
+        aria-label="Back to feed"
+        className="profile-back-arrow"
+      >
+        <img alt="" src="/backarrow.png" className="arrow-image" />
+      </Link>
       <div className="profile-header">
         <Avatar url={profile.profilePicUrl} name={profile.username} size={96} />
         <div>
@@ -397,10 +399,6 @@ const ProfilePage = ({ currentUsername, setProfilePicUrl }) => {
           ))}
         </div>
       )}
-
-      <p className="profile-back">
-        <Link to="/landingPage">Back to feed</Link>
-      </p>
     </div>
   );
 };
