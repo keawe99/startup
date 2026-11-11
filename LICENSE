@@ -1,3 +1,41 @@
+SneakPeek360
+
+Copyright (c) 2025-2026 Steven Armstrong. All rights reserved.
+
+This repository began from a course template provided by BYU Web Programming
+cs260 (see "Template code" below). Except for that template code, all of the
+source code, styles, text, and other content in this repository was written by
+the copyright holder and is NOT licensed for reuse. Without the prior written
+permission of the copyright holder, you may not copy, modify, merge, publish,
+distribute, sublicense, sell, or create derivative works from it, or use it in
+another project, in whole or in part.
+
+Nothing in this notice limits the rights that GitHub's Terms of Service give
+users to view and fork public repositories on GitHub, or any right you have
+under applicable law that cannot be waived by license.
+
+To ask for permission, contact the copyright holder through the GitHub account
+that owns this repository.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Template code
+-------------
+
+Portions of this repository originate from a course template provided by BYU
+Web Programming cs260. Those portions (the original template files and the
+code they contain, before any changes made in this repository) remain licensed
+under the MIT License below. The all-rights-reserved terms above apply to
+everything else.
+
+Third-party packages installed through npm are covered by their own licenses.
+
 MIT License
 
 Copyright (c) 2025 BYU Web Programming cs260

@@ -253,3 +253,7 @@ WebSocket (`/ws`) messages: `newPost` (author and accepted followers only), `lik
 - Image URLs in the S3 bucket are public, so a private account's photo is only hidden inside the app; anyone with the direct link can still open it. Real protection needs a private bucket with signed URLs.
 - Like counts are broadcast to every connected browser (only a post id and a number); comments do not update live.
 - Removing a follower and the follow-request flow have no notification badge.
+
+### License
+
+Copyright (c) 2025-2026 Steven Armstrong. All rights reserved. The code may not be copied, modified or reused without written permission, except for the portions that came from the BYU cs260 course template, which stay under the MIT License. See [LICENSE](LICENSE) for the full terms.
