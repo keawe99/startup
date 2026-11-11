@@ -26,8 +26,113 @@ export const Avatar = ({ url, name, size = 40 }) => {
   );
 };
 
+// The comments under one post: list, add box, delete buttons
+const Comments = ({ postId, onCountChange }) => {
+  const [comments, setComments] = useState(null);
+  const [text, setText] = useState("");
+  const [posting, setPosting] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    axios
+      .get(`/api/posts/${postId}/comments`)
+      .then(({ data }) => {
+        if (!cancelled) setComments(data);
+      })
+      .catch(() => {
+        if (!cancelled) setError("Could not load comments.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [postId]);
+
+  const submit = async (event) => {
+    event.preventDefault();
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    setPosting(true);
+    setError("");
+    try {
+      const { data } = await axios.post(`/api/posts/${postId}/comments`, {
+        text: trimmed,
+      });
+      setComments((prev) => [...(prev || []), data]);
+      setText("");
+      onCountChange(1);
+    } catch (err) {
+      setError(err.response?.data?.msg || "Could not post your comment.");
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  const remove = async (commentId) => {
+    setError("");
+    try {
+      await axios.delete(`/api/comments/${commentId}`);
+      setComments((prev) => prev.filter((c) => c._id !== commentId));
+      onCountChange(-1);
+    } catch {
+      setError("Could not delete that comment.");
+    }
+  };
+
+  return (
+    <div className="comments">
+      {comments === null && !error && (
+        <p className="muted-text">Loading comments...</p>
+      )}
+      {comments && comments.length === 0 && (
+        <p className="muted-text">No comments yet. Be the first.</p>
+      )}
+      <ul>
+        {(comments || []).map((c) => (
+          <li key={c._id} className="comment">
+            <p>
+              <Link
+                to={`/profile/${encodeURIComponent(c.username)}`}
+                className="comment-author"
+              >
+                {c.username}
+              </Link>{" "}
+              {c.text}
+            </p>
+            {c.canDelete && (
+              <button
+                type="button"
+                className="btn btn-link comment-delete"
+                onClick={() => remove(c._id)}
+                aria-label={`Delete comment by ${c.username}`}
+              >
+                Delete
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+      <form className="comment-form" onSubmit={submit}>
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Add a comment..."
+          maxLength={300}
+          aria-label="Add a comment"
+        />
+        <button type="submit" disabled={posting || !text.trim()}>
+          Post
+        </button>
+      </form>
+      {error && <p className="form-error">{error}</p>}
+    </div>
+  );
+};
+
 const LandingPage = () => {
   const [posts, setPosts] = useState([]);
+  const [openComments, setOpenComments] = useState(() => new Set());
   const [loaded, setLoaded] = useState(false); // so "empty feed" isn't flashed while loading
   const [pendingLikes, setPendingLikes] = useState(() => new Set());
 
@@ -85,6 +190,23 @@ const LandingPage = () => {
       socket.close();
     };
   }, []);
+
+  const toggleComments = (postId) =>
+    setOpenComments((prev) => {
+      const next = new Set(prev);
+      if (next.has(postId)) next.delete(postId);
+      else next.add(postId);
+      return next;
+    });
+
+  const changeCommentCount = (postId, delta) =>
+    setPosts((prev) =>
+      prev.map((p) =>
+        p._id === postId
+          ? { ...p, commentCount: Math.max(0, (p.commentCount || 0) + delta) }
+          : p
+      )
+    );
 
   // Flip the like on screen right away, then confirm with the server
   const flipLike = (postId) =>
@@ -173,9 +295,24 @@ const LandingPage = () => {
                 </span>
               </div>
               <p>{post.description}</p>
-              <a href="#" className="view-comments">
-                View Comments
-              </a>
+              <button
+                type="button"
+                className="btn btn-link view-comments"
+                onClick={() => toggleComments(post._id)}
+                aria-expanded={openComments.has(post._id)}
+              >
+                {openComments.has(post._id)
+                  ? "Hide comments"
+                  : post.commentCount > 0
+                    ? `View ${post.commentCount} ${post.commentCount === 1 ? "comment" : "comments"}`
+                    : "Add a comment"}
+              </button>
+              {openComments.has(post._id) && (
+                <Comments
+                  postId={post._id}
+                  onCountChange={(delta) => changeCommentCount(post._id, delta)}
+                />
+              )}
             </div>
           </div>
         ))}

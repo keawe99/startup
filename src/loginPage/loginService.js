@@ -1,38 +1,32 @@
 // loginService.js
 
 /**
- * Sends a login request to the backend API.
- * @param {object} formData - The login form data (username/email, password).
- * @returns {Promise<object>} - A promise that resolves with the user data or rejects with an error.
+ * Login step 1: check the username and password.
+ * Resolves with { mfaRequired | mfaSetupRequired, challengeToken }. The login
+ * cookie is only issued after the authenticator code step (see mfaPage.jsx).
+ * Rejects with an Error whose message is safe to show to the user.
  */
 export async function loginUser(formData) {
+  let response;
   try {
-    const response = await fetch("/api/auth/login", {
+    response = await fetch("/api/auth/login", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
-
-    if (response.ok) {
-      const userData = await response.json();
-      return userData; // Return the entire userData object
-    } else {
-      // Check if the response has content before trying to parse it as JSON
-      const text = await response.text();
-      try {
-        const errorData = JSON.parse(text);
-        throw new Error(errorData.msg || "Login failed");
-      } catch (jsonError) {
-        // If parsing JSON fails, throw a generic error
-        throw new Error("Login failed");
-      }
-    }
-  } catch (error) {
-    console.error("Login service error:", error);
-    throw new Error("Network error or server unavailable");
+  } catch {
+    throw new Error("Network error, check your connection and try again.");
   }
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(
+      response.status === 401
+        ? "Incorrect username or password."
+        : data.msg || "Login failed, try again.",
+    );
+  }
+  return data;
 }
 
 /**

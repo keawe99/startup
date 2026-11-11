@@ -3,7 +3,7 @@ import { loginUser } from "./loginService";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles.css";
 
-export default function LoginPage({ setUsername, onLogin }) {
+export default function LoginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
@@ -14,10 +14,15 @@ export default function LoginPage({ setUsername, onLogin }) {
     setError(null);
     setSubmitting(true);
     try {
-      const userData = await loginUser(formData);
-      setUsername(userData.username);
-      onLogin(); // Update isAuthenticated in App
-      navigate("/landingPage");
+      const result = await loginUser(formData);
+      // Password was right. Next: enter an authenticator code, or (first
+      // login with MFA) scan the QR code to set the app up.
+      navigate("/mfa", {
+        state: {
+          challengeToken: result.challengeToken,
+          mode: result.mfaSetupRequired ? "setup" : "verify",
+        },
+      });
     } catch (err) {
       setError(err.message);
       setSubmitting(false);
@@ -64,17 +69,11 @@ export default function LoginPage({ setUsername, onLogin }) {
         {error && (
           <p className="form-error" role="alert">
             {error}
-            {error === "Unauthorized" && (
-              <>
-                {" "}
-                Don't have an account? <Link to="/signUp">Sign up here</Link>.
-              </>
-            )}
           </p>
         )}
 
         <button type="submit" className="auth-submit" disabled={submitting}>
-          {submitting ? "Logging in..." : "Log in"}
+          {submitting ? "Checking..." : "Continue"}
         </button>
       </form>
 

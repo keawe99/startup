@@ -14,7 +14,7 @@ import AboutUs from "./aboutUs/aboutUs.jsx";
 import SignUp from "./signUp/signUp.jsx";
 import LandingPage from "./landingPage/landingPage.jsx";
 import LatestDrops from "./latestDrops/latestDrops.jsx";
-import Username from "./username/username.jsx";
+import MfaPage from "./mfaPage/mfaPage.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
 import ProfilePage from "./profilePage/profilePage.jsx";
 import SearchPage from "./searchPage/searchPage.jsx";
@@ -129,12 +129,6 @@ export default function App() {
     setIsAuthenticated(false);
   };
 
-  const handleUsernameSet = () => {
-    // The server just set the login cookie, so we are logged in now.
-    setIsAuthenticated(true);
-    setRenderKey((prevKey) => prevKey + 1); // re-check with the server
-  };
-
   // Don't decide who may see protected pages until the server has answered
   if (!authChecked) return null;
 
@@ -212,8 +206,12 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route
               path="/loginPage"
+              element={<LoginPage />}
+            />
+            <Route
+              path="/mfa"
               element={
-                <LoginPage setUsername={setUsername} onLogin={handleLogin} />
+                <MfaPage setUsername={setUsername} onLogin={handleLogin} />
               }
             />
             <Route path="/aboutUs" element={<AboutUs />} />
@@ -253,15 +251,6 @@ export default function App() {
                 <ProtectedRoute
                   isAuthenticated={isAuthenticated}
                   element={LatestDrops}
-                />
-              }
-            />
-            <Route
-              path="/username"
-              element={
-                <Username
-                  setUsername={setUsername}
-                  onUsernameSet={handleUsernameSet}
                 />
               }
             />

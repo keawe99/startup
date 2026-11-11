@@ -6,6 +6,7 @@ const { MongoClient, ObjectId } = require("mongodb");
 const cors = require("cors");
 const uploadHandler = require("./uploadHandler");
 const { toFeedPost } = require("./feed");
+const mfa = require("./mfa");
 const path = require("path");
 const fs = require("fs");
 const { WebSocketServer, WebSocket } = require("ws"); // WebSocket is needed for WebSocket.OPEN below
@@ -17,6 +18,15 @@ const authCookieName = "token";
 // Read dbConfig.json
 const config = JSON.parse(fs.readFileSync("./dbConfig.json", "utf8"));
 
+// Authenticator secrets are stored encrypted. Refuse to start without a valid
+// key, so a missing setting can never lead to secrets saved unprotected.
+try {
+  mfa.setEncryptionKey(config.MFA_ENCRYPTION_KEY);
+} catch (err) {
+  console.error(err.message);
+  process.exit(1);
+}
+
 // MongoDB Connection
 const url = config.MONGODB_URI;
 const client = new MongoClient(url);
@@ -25,6 +35,8 @@ let postsCollection; // Add postsCollection here
 // One document per follow: { followerId, followeeId, status, createdAt }
 // status is "pending" (waiting for a private account to approve) or "accepted"
 let followsCollection;
+// One document per comment: { postId, userId, username, text, createdAt }
+let commentsCollection;
 
 async function connectToDatabase() {
   try {
@@ -40,6 +52,23 @@ async function connectToDatabase() {
       { unique: true }
     );
     await followsCollection.createIndex({ followeeId: 1, status: 1 });
+    commentsCollection = db.collection("comments");
+    await commentsCollection.createIndex({ postId: 1, createdAt: 1 });
+
+    // One-time upgrade: encrypt authenticator secrets saved before encryption
+    // existed. Does nothing once every secret is encrypted.
+    const unencrypted = await usersCollection
+      .find({ mfaSecret: { $exists: true, $not: /^enc:v1:/ } })
+      .toArray();
+    for (const u of unencrypted) {
+      await usersCollection.updateOne(
+        { _id: u._id },
+        { $set: { mfaSecret: mfa.encryptSecret(u.mfaSecret, u._id) } }
+      );
+    }
+    if (unencrypted.length) {
+      console.log(`Encrypted ${unencrypted.length} authenticator secret(s)`);
+    }
   } catch (err) {
     console.error("Error connecting to MongoDB:", err);
   }
@@ -63,126 +92,279 @@ app.use(
 const apiRouter = express.Router();
 app.use(`/api`, apiRouter);
 
-// User Registration
+// ---- Sign up, login and MFA ----
+// Everyone must set up an authenticator app. A correct password (or a brand
+// new sign up) only earns a short-lived "challenge"; the real login cookie is
+// issued after a correct authenticator or recovery code. See mfa.js.
+
+const USERNAME_PATTERN = /^[A-Za-z0-9_.]{3,30}$/;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const exactCaseInsensitive = (s) => ({
+  $regex: `^${escapeRegex(s)}$`,
+  $options: "i",
+});
+
+// Log the user in: a new token stored in the database and sent as the cookie
+const startSession = async (res, user) => {
+  const token = uuid.v4();
+  await usersCollection.updateOne({ _id: user._id }, { $set: { token } });
+  res.cookie(authCookieName, token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Lax",
+    path: "/",
+  });
+};
+
+// What the browser does after the password step: enter a code, or set one up
+const nextMfaStep = (user) => {
+  const challengeToken = mfa.createChallenge(user._id);
+  return user.mfaEnabled
+    ? { mfaRequired: true, challengeToken }
+    : { mfaSetupRequired: true, challengeToken };
+};
+
+// Sign up: one form (username and password included). The account exists
+// afterwards but cannot log in until the authenticator app is set up.
 apiRouter.post("/auth/create", async (req, res) => {
   try {
-    // Check if user with the same email already exists
-    const existingEmailUser = await usersCollection.findOne({
-      email: req.body.email,
-    });
-    if (existingEmailUser) {
-      return res.status(409).json({ msg: "Existing email" });
+    const body = req.body || {};
+    const firstName = String(body.firstName || "").trim();
+    const lastName = String(body.lastName || "").trim();
+    const email = String(body.email || "").trim().toLowerCase();
+    const username = String(body.username || "").trim();
+    const password = String(body.password || "");
+
+    if (!firstName || !lastName) {
+      return res.status(400).json({ msg: "Enter your first and last name." });
+    }
+    if (!EMAIL_PATTERN.test(email)) {
+      return res.status(400).json({ msg: "Enter a valid email address." });
+    }
+    if (!USERNAME_PATTERN.test(username)) {
+      return res.status(400).json({
+        msg: "Username must be 3-30 characters: letters, numbers, . or _",
+      });
+    }
+    if (password.length < 8) {
+      return res
+        .status(400)
+        .json({ msg: "Password must be at least 8 characters." });
+    }
+    if (!body.birthday || Number.isNaN(Date.parse(body.birthday))) {
+      return res.status(400).json({ msg: "Enter your date of birth." });
     }
 
-    // Hash the password
-    const passwordHash = await bcrypt.hash(req.body.password, 10);
+    const existingEmail = await usersCollection.findOne({
+      email: exactCaseInsensitive(email),
+    });
+    if (existingEmail) {
+      if (existingEmail.username) {
+        return res
+          .status(409)
+          .json({ msg: "An account with that email already exists." });
+      }
+      // Left over from the old two-step sign up: it never got a username, so
+      // it can never log in. Replace it instead of blocking the email forever.
+      await usersCollection.deleteOne({ _id: existingEmail._id });
+    }
 
-    // Create a new user object
+    const existingUsername = await usersCollection.findOne({
+      username: exactCaseInsensitive(username),
+    });
+    if (existingUsername) {
+      return res.status(409).json({ msg: "That username is taken." });
+    }
+
     const newUser = {
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: passwordHash,
-      birthday: req.body.birthday,
-      nike: req.body.nike,
-      adidas: req.body.adidas,
-      nb: req.body.nb,
-      yeezy: req.body.yeezy,
-      puma: req.body.puma,
-      // Removed token from here
+      firstName,
+      lastName,
+      email,
+      username,
+      password: await bcrypt.hash(password, 10),
+      birthday: body.birthday,
+      nike: Boolean(body.nike),
+      adidas: Boolean(body.adidas),
+      nb: Boolean(body.nb),
+      yeezy: Boolean(body.yeezy),
+      puma: Boolean(body.puma),
+      mfaEnabled: false,
+      createdAt: new Date(),
     };
+    await usersCollection.insertOne(newUser); // adds newUser._id
 
-    // Insert the new user into the database
-    await usersCollection.insertOne(newUser);
-
-    // Removed cookie setting from here
-
-    res.status(201).json({ email: newUser.email }); // Send only email
+    res.status(201).json(nextMfaStep(newUser));
   } catch (error) {
     console.error("Error creating user:", error);
     res.status(500).json({ msg: "Failed to create user" });
   }
 });
 
-// User Username
-apiRouter.post("/auth/username", async (req, res) => {
-  try {
-    const { username, password, email } = req.body; // Receive password
-
-    // Check if the username already exists
-    const existingUsernameUser = await usersCollection.findOne({
-      username: username,
-    });
-    if (existingUsernameUser) {
-      return res.status(409).json({ msg: "Existing username" });
-    }
-
-    // Hash the password
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    // Update the user's username and password in the database.
-    // The SAME token must be stored in the database and sent in the cookie,
-    // otherwise verifyAuth can never match this session.
-    const token = uuid.v4();
-    const updateResult = await usersCollection.updateOne(
-      { email: email },
-      { $set: { username: username, password: passwordHash, token } }
-    );
-
-    if (updateResult.modifiedCount === 1) {
-      // Set the cookie here (no hard-coded domain, so it also works when deployed)
-      res.cookie(authCookieName, token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: "Lax",
-        path: "/",
-      });
-      res
-        .status(200)
-        .json({ msg: "Username and password updated successfully" });
-    } else {
-      res.status(404).json({ msg: "User not found" });
-    }
-  } catch (error) {
-    console.error("Error updating username:", error);
-    res.status(500).json({ msg: "Failed to update username" });
-  }
-});
-
-// User Login
+// Login, step 1: check the password. No cookie yet.
 apiRouter.post("/auth/login", async (req, res) => {
   try {
-    console.log("Login attempt for username:", req.body.username);
-    const user = await usersCollection.findOne({ username: req.body.username });
-    if (user) {
-      console.log("User found:", user.username);
-      const passwordMatch = await bcrypt.compare(
-        req.body.password,
-        user.password
-      );
-      if (passwordMatch) {
-        console.log("Password match successful");
-        user.token = uuid.v4();
-        await usersCollection.updateOne(
-          { _id: user._id },
-          { $set: { token: user.token } }
-        );
-        res.cookie(authCookieName, user.token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "Lax",
-        });
-        return res.send({ email: user.email, username: user.username });
-      } else {
-        console.log("Password match failed");
-      }
-    } else {
-      console.log("User not found");
+    const { username, password } = req.body || {};
+    // Only plain strings: an object here could be used as a database query
+    const user =
+      typeof username === "string" && typeof password === "string"
+        ? await usersCollection.findOne({ username })
+        : null;
+
+    if (user && user.password && (await bcrypt.compare(password, user.password))) {
+      return res.json(nextMfaStep(user));
     }
     res.status(401).json({ msg: "Unauthorized" });
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).json({ msg: "Internal server error" });
+  }
+});
+
+// MFA setup, step 1: make a secret and a QR code for the authenticator app
+apiRouter.post("/auth/mfa/setup", async (req, res) => {
+  try {
+    const challenge = mfa.getChallenge(req.body?.challengeToken);
+    if (!challenge) {
+      return res.status(401).json({ msg: "Your login expired, please start again." });
+    }
+    const user = await usersCollection.findOne({
+      _id: new ObjectId(challenge.userId),
+    });
+    if (!user || user.mfaEnabled) {
+      return res.status(400).json({ msg: "MFA is already set up for this account." });
+    }
+
+    // Asking twice (page refresh) must show the same secret, not a new one
+    const setup = await mfa.generateSetup(user.username, challenge.pendingSecret);
+    challenge.pendingSecret = setup.secret;
+    res.json({ qrDataUrl: setup.qrDataUrl, secret: setup.secret });
+  } catch (error) {
+    console.error("Error starting MFA setup:", error);
+    res.status(500).json({ msg: "Failed to start MFA setup" });
+  }
+});
+
+// MFA setup, step 2: prove the app works by entering a code. This turns MFA
+// on, hands out the one-time recovery codes, and logs the user in.
+apiRouter.post("/auth/mfa/verify-setup", async (req, res) => {
+  try {
+    const { challengeToken, code } = req.body || {};
+    const challenge = mfa.getChallenge(challengeToken);
+    if (!challenge || !challenge.pendingSecret) {
+      return res.status(401).json({ msg: "Your login expired, please start again." });
+    }
+    const user = await usersCollection.findOne({
+      _id: new ObjectId(challenge.userId),
+    });
+    if (!user || user.mfaEnabled) {
+      return res.status(400).json({ msg: "MFA is already set up for this account." });
+    }
+    if (mfa.isLocked(user._id)) {
+      return res.status(429).json({ msg: "Too many wrong codes. Try again in 15 minutes." });
+    }
+
+    const step = mfa.checkTotp(challenge.pendingSecret, code);
+    if (step === null) {
+      mfa.recordChallengeFailure(challengeToken);
+      mfa.recordUserFailure(user._id);
+      return res.status(401).json({
+        msg: "That code isn't right. Check your authenticator app and try again.",
+      });
+    }
+
+    const { codes, hashes } = mfa.generateRecoveryCodes();
+    await usersCollection.updateOne(
+      { _id: user._id },
+      {
+        $set: {
+          mfaEnabled: true,
+          mfaSecret: mfa.encryptSecret(challenge.pendingSecret, user._id),
+          mfaRecoveryHashes: hashes,
+          mfaLastStep: step,
+        },
+      }
+    );
+    mfa.deleteChallenge(challengeToken);
+    mfa.clearUserFailures(user._id);
+    await startSession(res, user);
+    res.json({ username: user.username, recoveryCodes: codes });
+  } catch (error) {
+    console.error("Error finishing MFA setup:", error);
+    res.status(500).json({ msg: "Failed to finish MFA setup" });
+  }
+});
+
+// Login, step 2: an authenticator code (or a one-time recovery code)
+apiRouter.post("/auth/mfa/verify", async (req, res) => {
+  try {
+    const { challengeToken, code, recoveryCode } = req.body || {};
+    const challenge = mfa.getChallenge(challengeToken);
+    if (!challenge) {
+      return res.status(401).json({ msg: "Your login expired, please log in again." });
+    }
+    const user = await usersCollection.findOne({
+      _id: new ObjectId(challenge.userId),
+    });
+    if (!user || !user.mfaEnabled || !user.mfaSecret) {
+      return res.status(401).json({ msg: "Your login expired, please log in again." });
+    }
+    if (mfa.isLocked(user._id)) {
+      return res.status(429).json({ msg: "Too many wrong codes. Try again in 15 minutes." });
+    }
+
+    let ok = false;
+    let usedRecovery = false;
+    if (typeof recoveryCode === "string" && recoveryCode) {
+      // Removing the hash and checking it existed is one atomic step, so a
+      // recovery code can only ever be used once
+      const hash = mfa.hashRecoveryCode(recoveryCode);
+      const result = await usersCollection.updateOne(
+        { _id: user._id, mfaRecoveryHashes: hash },
+        { $pull: { mfaRecoveryHashes: hash } }
+      );
+      ok = result.modifiedCount === 1;
+      usedRecovery = ok;
+    } else {
+      const step = mfa.checkTotp(mfa.decryptSecret(user.mfaSecret, user._id), code);
+      if (step !== null) {
+        // A code can't be reused: its time step must be newer than the last one
+        // accepted (checked and saved in one atomic update)
+        const result = await usersCollection.updateOne(
+          {
+            _id: user._id,
+            $or: [
+              { mfaLastStep: { $lt: step } },
+              { mfaLastStep: { $exists: false } },
+            ],
+          },
+          { $set: { mfaLastStep: step } }
+        );
+        ok = result.modifiedCount === 1;
+      }
+    }
+
+    if (!ok) {
+      mfa.recordChallengeFailure(challengeToken);
+      mfa.recordUserFailure(user._id);
+      return res.status(401).json({
+        msg: usedRecovery === false && recoveryCode
+          ? "That recovery code isn't valid."
+          : "That code isn't right. Check your authenticator app and try again.",
+      });
+    }
+
+    mfa.deleteChallenge(challengeToken);
+    mfa.clearUserFailures(user._id);
+    await startSession(res, user);
+    res.json({
+      username: user.username,
+      recoveryCodesRemaining:
+        (user.mfaRecoveryHashes || []).length - (usedRecovery ? 1 : 0),
+    });
+  } catch (error) {
+    console.error("Error verifying MFA code:", error);
+    res.status(500).json({ msg: "Failed to verify code" });
   }
 });
 
@@ -279,7 +461,24 @@ apiRouter.get("/posts", verifyAuth, async (req, res) => {
       : [];
     const pictures = new Map(users.map((u) => [String(u._id), u.profilePicUrl]));
 
-    res.json(posts.map((p) => toFeedPost(p, pictures.get(p.userId), viewerId)));
+    // How many comments each post has
+    const counts = new Map(
+      (
+        await commentsCollection
+          .aggregate([
+            { $match: { postId: { $in: posts.map((p) => String(p._id)) } } },
+            { $group: { _id: "$postId", n: { $sum: 1 } } },
+          ])
+          .toArray()
+      ).map((c) => [c._id, c.n])
+    );
+
+    res.json(
+      posts.map((p) => ({
+        ...toFeedPost(p, pictures.get(p.userId), viewerId),
+        commentCount: counts.get(String(p._id)) || 0,
+      }))
+    );
   } catch (error) {
     console.error("Error fetching posts:", error);
     res.status(500).json({ message: "Failed to fetch posts" });
@@ -641,6 +840,110 @@ apiRouter.post("/posts/:id/like", verifyAuth, async (req, res) => {
   } catch (error) {
     console.error("Error toggling like:", error);
     res.status(500).json({ msg: "Failed to update like" });
+  }
+});
+
+// ---- Comments ----
+const MAX_COMMENT_LENGTH = 300;
+
+const shapeComment = (c, viewerId, postOwnerId) => ({
+  _id: String(c._id),
+  username: c.username,
+  text: c.text,
+  createdAt: c.createdAt,
+  // You can delete your own comments, and the post owner can delete any
+  canDelete: c.userId === viewerId || postOwnerId === viewerId,
+});
+
+// Load a post the viewer is allowed to see, or answer 404 (never reveal that a
+// private account's post exists)
+const postForComments = async (req, res) => {
+  if (!ObjectId.isValid(req.params.id)) {
+    res.status(400).json({ msg: "Invalid post id" });
+    return null;
+  }
+  const post = await postsCollection.findOne(
+    { _id: new ObjectId(req.params.id) },
+    { projection: { userId: 1 } }
+  );
+  if (!post || !(await canViewUserPosts(String(req.user._id), post.userId))) {
+    res.status(404).json({ msg: "Post not found" });
+    return null;
+  }
+  return post;
+};
+
+apiRouter.get("/posts/:id/comments", verifyAuth, async (req, res) => {
+  try {
+    const post = await postForComments(req, res);
+    if (!post) return;
+    const comments = await commentsCollection
+      .find({ postId: req.params.id })
+      .sort({ createdAt: 1 })
+      .limit(200)
+      .toArray();
+    const me = String(req.user._id);
+    res.json(comments.map((c) => shapeComment(c, me, post.userId)));
+  } catch (error) {
+    console.error("Error loading comments:", error);
+    res.status(500).json({ msg: "Failed to load comments" });
+  }
+});
+
+apiRouter.post("/posts/:id/comments", verifyAuth, async (req, res) => {
+  try {
+    const post = await postForComments(req, res);
+    if (!post) return;
+
+    const text = String(req.body?.text || "").trim();
+    if (!text || text.length > MAX_COMMENT_LENGTH) {
+      return res.status(400).json({
+        msg: `Comments must be 1-${MAX_COMMENT_LENGTH} characters.`,
+      });
+    }
+
+    const me = String(req.user._id);
+    const comment = {
+      postId: req.params.id,
+      userId: me,
+      username: req.user.username,
+      text,
+      createdAt: new Date(),
+    };
+    await commentsCollection.insertOne(comment);
+    res.status(201).json(shapeComment(comment, me, post.userId));
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res.status(500).json({ msg: "Failed to add comment" });
+  }
+});
+
+apiRouter.delete("/comments/:id", verifyAuth, async (req, res) => {
+  try {
+    if (!ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ msg: "Invalid comment id" });
+    }
+    const comment = await commentsCollection.findOne({
+      _id: new ObjectId(req.params.id),
+    });
+    if (!comment) return res.status(404).json({ msg: "Comment not found" });
+
+    const me = String(req.user._id);
+    const post = ObjectId.isValid(comment.postId)
+      ? await postsCollection.findOne(
+          { _id: new ObjectId(comment.postId) },
+          { projection: { userId: 1 } }
+        )
+      : null;
+    if (comment.userId !== me && post?.userId !== me) {
+      return res.status(403).json({ msg: "You can't delete that comment" });
+    }
+
+    await commentsCollection.deleteOne({ _id: comment._id });
+    res.json({ ok: true });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    res.status(500).json({ msg: "Failed to delete comment" });
   }
 });
 

@@ -94,3 +94,38 @@ AxiosError {message: 'Request failed with status code 500', name: 'AxiosError', 
 handleSubmit @ uploadPhoto.jsx:35
 
 Check out axios error. we defined it in landingPage.jsx and could be causing errors. image seemed to be uploading in s3 storage cloud just fine. Maybe login to s3 to see if there are images there.
+
+# Feature Work Notes (after the deliverables)
+
+Summary of everything added after the course deliverables. The full write-up (API list, architecture, setup) is in the "Project update" section of README.md.
+
+## Features added
+
+- **Profile pages** at /profile/:username with a photo grid, profile picture, and photo / follower / following counts. Usernames in the feed link to them, and there are links in the top nav and the phone tab bar. Profile pictures can be changed from your own profile page. HEIC and SVG uploads are not supported (JPEG, PNG, GIF, WebP up to 5 MB, checked by file contents).
+- **Likes** with live counts over WebSocket.
+- **User search** at /search: case-insensitive, usernames that start with the search come first.
+- **Follow system** with a follows collection. Private accounts need to approve follow requests, can decline them, and can remove existing followers. The feed now shows only your own posts plus people you follow. Privacy is enforced on the server (locked profiles send no posts, likes and comments on private posts return 404, live new-post messages only go to the author and accepted followers).
+- **Comments**: "View Comments" now expands inline with an add box, count, and delete (own comments, or any comment on your own post).
+- **Sign up flow**: one form instead of two steps, so the password is only typed once. Server-side validation added.
+- **Required MFA**: every user sets up an authenticator app (QR code) and gets 8 one-time recovery codes. Login is password then 6-digit code. Codes can't be reused, wrong codes are limited, and secrets are encrypted in the database with a key in dbConfig.json (MFA_ENCRYPTION_KEY).
+- **Upload page** redesigned with a drag-and-drop zone, preview, and a description counter.
+
+## CSS changes
+
+- **Theme**: replaced the textured background with a flat near-black theme and a single red accent. All colors are CSS variables in :root (--bg, --surface, --surface-2, --border, --text, --muted, --accent, --accent-hover, --accent-text), so the palette can be changed in one place.
+- **Buttons**: one consistent red button style for every plain button, plus a .button-secondary variant (dark with a border) for Cancel, Following, Requested, Remove and Private toggles.
+- **Nav**: header tiles aligned to the center, Logout styled like the other tiles, active link outlined in red. The right-hand sidebar on the feed page was removed.
+- **Feed**: post cards capped at 640px wide with a 560px image height, rounded cards with a soft shadow, like button and like count row.
+- **Mobile (768px breakpoint)**: smaller nav tiles, 44px minimum touch targets, 16px inputs (stops iOS zooming into a field), the home video scales instead of staying 600x400, and an Instagram-style bottom tab bar (Feed, Drops, Search, Upload, Profile) fixed to the bottom with safe-area padding, replacing the top links on phones.
+- **Auth pages** (sign up, login, MFA): shared card layout, logo capped at 240px wide (it was a fixed 900x500), dark inputs with a red focus ring, pill toggles instead of bare checkboxes for shoe brands, a light date-picker icon on the dark background, inline red error text.
+- **Profile**: one centered column, avatar and stats stacked in the middle, photo grid in flexbox (three per row) so a short last row is centered too, a back arrow, and a "Private" badge.
+- **Upload**: dashed drop zone that turns red on hover or focus, image preview, spaced Cancel / Upload buttons.
+- **Comments, search, requests**: small card and list styles that reuse the same variables.
+
+## Lessons learned
+
+- The backend (node index.js) does not reload when its files change. Several "the button is missing" or "it didn't work" reports were really a backend that was still running old code. Restart it after server changes. The Vite frontend reloads by itself.
+- A try/catch that rethrows a new generic error hides the real one. The old login service turned every failure into "Network error", which made wrong-password errors look like server problems.
+- Hiding something in the UI is not privacy. Anything that must be private has to be enforced on the server, including the live WebSocket messages and endpoints reached by id.
+- Pushing to GitHub does not change the live site. Run deployService.sh to release. It also copies service/*.json (including dbConfig.json), so a new key added locally travels with the deploy.
+- The Latest Drops page still calls http://localhost:4001, so it only works on my own computer. Plan: store upcoming drops in my own database (an upcomingDrops collection) and show them as a calendar.

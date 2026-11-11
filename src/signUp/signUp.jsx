@@ -29,9 +29,10 @@ const SignUp = () => {
       });
       const data = await response.json().catch(() => ({}));
       if (response.ok) {
-        navigate("/username", { state: { email: data.email } });
-      } else if (response.status === 409) {
-        setError("An account with that email already exists.");
+        // Account created. Everyone must set up an authenticator app next.
+        navigate("/mfa", {
+          state: { challengeToken: data.challengeToken, mode: "setup" },
+        });
       } else {
         setError(data.msg || "Sign up failed, try again.");
       }
@@ -83,6 +84,22 @@ const SignUp = () => {
         </div>
 
         <div className="field">
+          <label htmlFor="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            autoComplete="username"
+            required
+            minLength={3}
+            maxLength={30}
+            pattern="[A-Za-z0-9_.]+"
+            title="Letters, numbers, . or _ (3-30 characters)"
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="field">
           <label htmlFor="email">Email</label>
           <input
             type="email"
@@ -102,6 +119,7 @@ const SignUp = () => {
             name="password"
             autoComplete="new-password"
             required
+            minLength={8}
             onChange={handleChange}
           />
         </div>
