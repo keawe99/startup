@@ -15,6 +15,7 @@ import SignUp from "./signUp/signUp.jsx";
 import LandingPage from "./landingPage/landingPage.jsx";
 import LatestDrops from "./latestDrops/latestDrops.jsx";
 import HomePage from "./homePage/homePage.jsx";
+import NotFound from "./notFound/notFound.jsx";
 import MfaPage from "./mfaPage/mfaPage.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
 import ProfilePage from "./profilePage/profilePage.jsx";
@@ -224,6 +225,10 @@ export default function App() {
                   element={UploadPage}
                 />
               }
+            />
+            <Route
+              path="*"
+              element={<NotFound isAuthenticated={isAuthenticated} />}
             />
           </Routes>
         </div>

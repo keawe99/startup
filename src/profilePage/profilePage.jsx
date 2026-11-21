@@ -267,6 +267,14 @@ const ProfilePage = ({ currentUsername, setProfilePicUrl }) => {
     }
   };
 
+  if (error) {
+    return (
+      <div className="container text-center">
+        <p className="form-error">{error}</p>
+        <Link to="/landingPage">Back to feed</Link>
+      </div>
+    );
+  }
   if (!profile) return null;
 
   // Only your own profile can change its picture

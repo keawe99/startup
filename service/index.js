@@ -947,33 +947,6 @@ apiRouter.delete("/comments/:id", verifyAuth, async (req, res) => {
   }
 });
 
-// Use the upload handler
-// app.use("/api/upload", uploadHandler(wss, postsCollection)); // Pass wss and postsCollection
-
-// Landing Page Route (Example)
-apiRouter.get("/landingPage", verifyAuth, (req, res) => {
-  // Your landing page logic here
-  res.send({ msg: "Landing page data" });
-});
-
-// Upload Photo Route (Example)
-apiRouter.get("/uploadPhoto", verifyAuth, (req, res) => {
-  // Your upload photo logic here
-  res.send({ msg: "Upload photo data" });
-});
-
-// Latest Drops Route (Example)
-apiRouter.get("/latestDrops", verifyAuth, (req, res) => {
-  // Your latest drops logic here
-  res.send({ msg: "Latest drops data" });
-});
-
-// Username Route (Example)
-apiRouter.get("/username", verifyAuth, (req, res) => {
-  // Your username logic here
-  res.send({ msg: "Username data" });
-});
-
 // WebSocket Setup
 const server = app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
@@ -1027,14 +1000,20 @@ wss.on("connection", async (ws, req) => {
   });
 });
 
+// Single-page app: any other address (a refreshed or shared link such as
+// /profile/someone) gets the React app, which then shows the right page or
+// its own "not found" screen. Unknown /api addresses stay real 404s.
+app.use((req, res) => {
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ msg: "Not found" });
+  }
+  res.sendFile("index.html", { root: "public" }, (err) => {
+    if (err) res.status(404).send("Not found"); // e.g. no frontend build in dev
+  });
+});
+
 // Default Error Handler
 app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).send({ type: err.name, message: err.message });
 });
-
-apiRouter.get("/test", (req, res) => {
-  res.send("Test route working!");
-});
-
-// Return the application's default

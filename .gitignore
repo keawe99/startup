@@ -1,3 +1,6 @@
 node_modules/
 .dbConfig.json
 service/dbConfig.json
+.DS_Store
+dist/
+build/
