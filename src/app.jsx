@@ -14,54 +14,13 @@ import AboutUs from "./aboutUs/aboutUs.jsx";
 import SignUp from "./signUp/signUp.jsx";
 import LandingPage from "./landingPage/landingPage.jsx";
 import LatestDrops from "./latestDrops/latestDrops.jsx";
+import HomePage from "./homePage/homePage.jsx";
 import MfaPage from "./mfaPage/mfaPage.jsx";
 import UploadPage from "./uploadPhoto/uploadPhoto.jsx";
 import ProfilePage from "./profilePage/profilePage.jsx";
 import SearchPage from "./searchPage/searchPage.jsx";
 import BottomNav from "./bottomNav/bottomNav.jsx";
 import ProtectedRoute from "./protectedRoute/protectedRoute.jsx";
-
-const Home = () => {
-  return (
-    <div className="container">
-      <div className="row justify-content-center">
-        <div className="col-md-8 text-center">
-          <h1>Welcome to SneakPeek360</h1> <br></br>
-          <iframe
-            width="600"
-            height="400"
-            src="https://www.youtube.com/embed/zkXkrSLe-nQ?si=y4oEwd4MOoy9Zetv&autoplay=1&loop=1&playlist=zkXkrSLe-nQ&mute=1"
-            title="YouTube video player"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          ></iframe>
-          <br />
-          <p>
-            Introducing SneakPeek360 - the ultimate app for sneakerheads to
-            showcase <br />
-            their collections and stay ahead of the game. Upload photos of your
-            kicks, <br />
-            organize your collection, and connect with fellow enthusiasts. Plus,
-            get <br />
-            real-time updates on the latest sneaker drops, exclusive releases,
-            and <br />
-            latest collabs, so you'll never miss the heat. Whether you're a
-            collector <br />
-            or just love sneakers, SneakPeek360 is the place to be
-          </p>
-          <footer>
-            <p>
-              SneakPeek is dedicated to provide to its users and sneakerheads a
-              seamless experience in their journey of chasing heat
-            </p>
-          </footer>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Lives inside <BrowserRouter> (rendered below) so it can use useNavigate
 const LogoutButton = ({ onLogout, setUsername }) => {
@@ -203,7 +162,10 @@ export default function App() {
             </div>
           </div>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route
+              path="/"
+              element={<HomePage isAuthenticated={isAuthenticated} />}
+            />
             <Route
               path="/loginPage"
               element={<LoginPage />}
